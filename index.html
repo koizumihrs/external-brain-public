@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>弁理士試験 詰将棋トレーナー (Level 1.6 - データ外部分離モデル)</title>
+    <title>弁理士試験 詰将棋トレーナー (Level 1.7 - スマホスクロール改善＆ボイス機能搭載版)</title>
     <style>
         :root {
             --bg-color: #1a1a1a;
@@ -15,6 +15,8 @@
             --wrong-color: #ff4d4d;
             --choice-bg: #333333;
             --choice-hover: #444444;
+            --voice-bg: #1e3a3a;
+            --voice-border: #00ADB5;
         }
 
         body {
@@ -28,7 +30,7 @@
             overflow: hidden;
         }
 
-        /* 左側：コントロール＆ミニマップ */
+        /* 左側：コントロール＆ミニマップ（スマホ対応で縦独立スクロールを有効化） */
         #sidebar {
             width: 350px;
             background-color: var(--panel-bg);
@@ -37,6 +39,9 @@
             flex-direction: column;
             padding: 20px;
             box-sizing: border-box;
+            height: 100vh;
+            overflow-y: auto; /* サイドバー自体をスクロール可能に修正 */
+            -webkit-overflow-scrolling: touch; /* iOSでのスクロールを滑らかに */
         }
 
         h2 {
@@ -47,12 +52,9 @@
             margin-bottom: 12px;
         }
 
-        #chapter-controls {
+        #chapter-controls, #importance-controls, #voice-controls {
             margin-bottom: 15px;
-        }
-
-        #importance-controls {
-            margin-bottom: 15px;
+            flex-shrink: 0; /* 折りたたまれ防止 */
         }
 
         .control-toggle {
@@ -69,7 +71,6 @@
 
         #minimap-container {
             flex-grow: 1;
-            overflow-y: auto;
             margin-top: 5px;
             padding-right: 5px;
         }
@@ -122,25 +123,52 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 40px;
+            padding: 20px;
             position: relative;
+            overflow-y: auto;
         }
 
         #quiz-box {
             max-width: 650px;
             width: 100%;
             background: var(--panel-bg);
-            padding: 40px;
+            padding: 30px;
             border-radius: 10px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             text-align: center;
+            box-sizing: border-box;
+        }
+
+        /* 新設：キャラクター吹き出しエリア */
+        #voice-bubble {
+            background-color: var(--voice-bg);
+            border-left: 4px solid var(--voice-border);
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: left;
+            display: none;
+        }
+
+        #voice-char-name {
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 4px;
+        }
+
+        #voice-char-line {
+            font-size: 0.95rem;
+            font-style: italic;
+            color: #fff;
+            line-height: 1.4;
         }
 
         #question-text {
-            font-size: 1.25rem;
-            line-height: 1.7;
-            margin-bottom: 35px;
-            min-height: 120px;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            min-height: 100px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -158,8 +186,8 @@
             background-color: var(--choice-bg);
             border: 2px solid #444;
             color: #fff;
-            font-size: 1.2rem;
-            padding: 18px;
+            font-size: 1.1rem;
+            padding: 16px;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.15s ease;
@@ -216,6 +244,14 @@
             opacity: 1;
         }
 
+        /* レスポンシブ対応：スマホ画面では左右並びから縦並びにスイッチ */
+        @media (max-width: 768px) {
+            body { flex-direction: column; overflow: auto; height: auto; }
+            #sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #3d3d3d; }
+            #main-panel { padding: 20px 10px; }
+            #choices-area { grid-template-columns: 1fr; }
+        }
+
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #222; }
         ::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
@@ -234,15 +270,25 @@
             <label class="control-toggle"><input type="checkbox" checked value="2"> ★★ （標準条文）</label>
             <label class="control-toggle"><input type="checkbox" checked value="1"> ★ （その他・条文のみ）</label>
         </div>
+
+        <h2>表示設定</h2>
+        <div id="voice-controls">
+            <label class="control-toggle"><input type="checkbox" id="voice-toggle" checked> 💡 キャラクターボイスを表示</label>
+        </div>
         
         <h2 style="margin-top: 10px;">条文ミニマップ</h2>
         <div id="minimap-container"></div>
     </div>
 
     <div id="main-panel">
-        <div id="toast">🎉 章 コンプリート！</div>
+        <div id="toast">🎉 章 条件クリア！</div>
         
         <div id="quiz-box">
+            <div id="voice-bubble">
+                <div id="voice-char-name">キャラクター名</div>
+                <div id="voice-char-line">「セリフ」</div>
+            </div>
+
             <div id="question-text">章または頻出度を選択してください。</div>
             <div id="choices-area" style="display: none;">
                 <button class="choice-btn" data-index="0">--</button>
@@ -254,7 +300,6 @@
     </div>
 
     <script>
-        // サウンド生成エンジン (Web Audio API)
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
         function playSound(type) {
@@ -298,26 +343,30 @@
             return `${str}条`;
         }
 
-        // 状態管理
         let activeChapters = new Set([]);
         let activeImportances = new Set([1, 2, 3]);
         let correctArticles = new Set();
         let currentQuestion = null;
         let questionQueue = [];
         let wrongAttempted = false;
+        let showVoice = true; // ボイス表示フラグ
 
         const chapterControls = document.getElementById('chapter-controls');
         const importanceControls = document.getElementById('importance-controls');
+        const voiceToggle = document.getElementById('voice-toggle');
         const minimapContainer = document.getElementById('minimap-container');
         const questionText = document.getElementById('question-text');
         const choicesArea = document.getElementById('choices-area');
         const choiceBtns = document.querySelectorAll('.choice-btn');
         const toast = document.getElementById('toast');
+        
+        const voiceBubble = document.getElementById('voice-bubble');
+        const voiceCharName = document.getElementById('voice-char-name');
+        const voiceCharLine = document.getElementById('voice-char-line');
 
         function initGame() {
-            // データが正しく読み込めているか検証
             if (typeof patentLawData === 'undefined' || !Array.isArray(patentLawData)) {
-                questionText.innerText = "エラー: patent_data.js が見つからないか、データ構造が壊れています。同じフォルダにファイルがあるか確認してください。";
+                questionText.innerText = "エラー: patent_data.js が見つかりません。";
                 return;
             }
 
@@ -337,6 +386,12 @@
                     else activeImportances.delete(val);
                     renderMinimap(); generateQueue(); nextQuestion();
                 });
+            });
+
+            // ボイス表示切り替えスイッチのイベント
+            voiceToggle.addEventListener('change', (e) => {
+                showVoice = e.target.checked;
+                updateVoiceDisplay();
             });
         }
 
@@ -408,6 +463,7 @@
             if (activeChapters.size === 0) {
                 questionText.innerText = "まずは左側の「章 選択」から、勉強したい章にチェックを入れてください。";
                 choicesArea.style.display = 'none';
+                voiceBubble.style.display = 'none';
                 currentQuestion = null;
                 return;
             }
@@ -417,6 +473,7 @@
                 if (questionQueue.length === 0) {
                     questionText.innerText = "選択された条件（章・頻出度）の全問題をクリアしました！他の章や頻出度をONにしてください。";
                     choicesArea.style.display = 'none';
+                    voiceBubble.style.display = 'none';
                     currentQuestion = null;
                     return;
                 }
@@ -424,7 +481,20 @@
             choicesArea.style.display = 'grid';
             currentQuestion = questionQueue.shift();
             questionText.innerText = currentQuestion.summary;
+            
+            updateVoiceDisplay();
             renderChoices();
+        }
+
+        // キャラクターセリフの表示アップデート
+        function updateVoiceDisplay() {
+            if (currentQuestion && showVoice && currentQuestion.charName && currentQuestion.charLine) {
+                voiceCharName.innerText = `📍 ${currentQuestion.address} ： ${currentQuestion.charName}`;
+                voiceCharLine.innerText = currentQuestion.charLine;
+                voiceBubble.style.display = 'block';
+            } else {
+                voiceBubble.style.display = 'none';
+            }
         }
 
         function renderChoices() {
