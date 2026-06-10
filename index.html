@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>弁理士試験 詰将棋トレーナー (Level 1.7 - スマホスクロール改善＆ボイス機能搭載版)</title>
+    <title>弁理士試験 詰将棋トレーナー (Level 1.8 - 2軸システムアーキテクチャ版)</title>
     <style>
         :root {
             --bg-color: #1a1a1a;
@@ -17,6 +17,15 @@
             --choice-hover: #444444;
             --voice-bg: #1e3a3a;
             --voice-border: #00ADB5;
+            --hint-bg: #222222;
+
+            /* 軸①：行為主体カラー定義 */
+            --color-applicant: #2b5c8f;   /* 青 */
+            --color-system: #4a4a4a;      /* 灰 */
+            --color-examiner: #dcdcdc;    /* 白 */
+            --color-court: #111111;       /* 黒 */
+            --color-competitor: #8b2626;  /* 赤 */
+            --color-environment: #2e5c2e; /* 緑 */
         }
 
         body {
@@ -30,7 +39,7 @@
             overflow: hidden;
         }
 
-        /* 左側：コントロール＆ミニマップ（スマホ対応で縦独立スクロールを有効化） */
+        /* 左側：コントロール＆ミニマップ */
         #sidebar {
             width: 350px;
             background-color: var(--panel-bg);
@@ -40,8 +49,8 @@
             padding: 20px;
             box-sizing: border-box;
             height: 100vh;
-            overflow-y: auto; /* サイドバー自体をスクロール可能に修正 */
-            -webkit-overflow-scrolling: touch; /* iOSでのスクロールを滑らかに */
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         h2 {
@@ -54,7 +63,7 @@
 
         #chapter-controls, #importance-controls, #voice-controls {
             margin-bottom: 15px;
-            flex-shrink: 0; /* 折りたたまれ防止 */
+            flex-shrink: 0;
         }
 
         .control-toggle {
@@ -103,17 +112,23 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            border: 1px solid transparent;
         }
 
-        .minimap-item.active {
-            color: #888;
-        }
+        /* 軸①のカラー反映（アクティブ時） */
+        .minimap-item.active.actor-applicant { background-color: var(--color-applicant); color: #fff; }
+        .minimap-item.active.actor-system { background-color: var(--color-system); color: #ccc; }
+        .minimap-item.active.actor-examiner { background-color: var(--color-examiner); color: #000; font-weight: bold; }
+        .minimap-item.active.actor-court { background-color: var(--color-court); color: #fff; border-color: #444; }
+        .minimap-item.active.actor-competitor { background-color: var(--color-competitor); color: #fff; }
+        .minimap-item.active.actor-environment { background-color: var(--color-environment); color: #fff; }
 
         .minimap-item.correct {
-            background: #444;
-            color: var(--correct-color);
+            background-color: #fff !important;
+            color: #000 !important;
             font-weight: bold;
-            box-shadow: 0 0 8px rgba(255,255,255,0.5);
+            box-shadow: 0 0 10px rgba(255,255,255,0.8);
+            border-color: var(--accent-color) !important;
         }
 
         /* 右側：クイズエリア */
@@ -139,7 +154,32 @@
             box-sizing: border-box;
         }
 
-        /* 新設：キャラクター吹き出しエリア */
+        /* 新設：2軸システムアーキテクチャハブ */
+        #architecture-hub {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .arch-badge {
+            font-size: 0.8rem;
+            font-weight: bold;
+            padding: 6px 12px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-role {
+            background-color: #111;
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        /* フレーバーテキスト（セリフ） */
         #voice-bubble {
             background-color: var(--voice-bg);
             border-left: 4px solid var(--voice-border);
@@ -244,7 +284,6 @@
             opacity: 1;
         }
 
-        /* レスポンシブ対応：スマホ画面では左右並びから縦並びにスイッチ */
         @media (max-width: 768px) {
             body { flex-direction: column; overflow: auto; height: auto; }
             #sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #3d3d3d; }
@@ -273,6 +312,7 @@
 
         <h2>表示設定</h2>
         <div id="voice-controls">
+            <label class="control-toggle"><input type="checkbox" id="hint-toggle" checked> ⚙️ プログラミング2軸ヒントを表示</label>
             <label class="control-toggle"><input type="checkbox" id="voice-toggle" checked> 💡 キャラクターボイスを表示</label>
         </div>
         
@@ -284,6 +324,11 @@
         <div id="toast">🎉 章 条件クリア！</div>
         
         <div id="quiz-box">
+            <div id="architecture-hub">
+                <div id="badge-actor" class="arch-badge">行為主体</div>
+                <div id="badge-role" class="arch-badge badge-role">ROLE</div>
+            </div>
+
             <div id="voice-bubble">
                 <div id="voice-char-name">キャラクター名</div>
                 <div id="voice-char-line">「セリフ」</div>
@@ -343,23 +388,53 @@
             return `${str}条`;
         }
 
+        // 軸①に対応するCSSクラスマッピング
+        function getActorClass(actorStr) {
+            if (!actorStr) return '';
+            if (actorStr.includes('出願人')) return 'actor-applicant';
+            if (actorStr.includes('システム')) return 'actor-system';
+            if (actorStr.includes('審査官')) return 'actor-examiner';
+            if (actorStr.includes('裁判所')) return 'actor-court';
+            if (actorStr.includes('第三者')) return 'actor-competitor';
+            if (actorStr.includes('環境')) return 'actor-environment';
+            return '';
+        }
+
+        // 軸①に対応するバッジカラー背景設定
+        function setActorBadgeStyle(el, actorStr) {
+            if (!actorStr) return;
+            el.innerText = actorStr;
+            if (actorStr.includes('出願人')) { el.style.backgroundColor = 'var(--color-applicant)'; el.style.color = '#fff'; }
+            else if (actorStr.includes('システム')) { el.style.backgroundColor = 'var(--color-system)'; el.style.color = '#ccc'; }
+            else if (actorStr.includes('審査官')) { el.style.backgroundColor = 'var(--color-examiner)'; el.style.color = '#000'; }
+            else if (actorStr.includes('裁判所')) { el.style.backgroundColor = 'var(--color-court)'; el.style.color = '#fff'; }
+            else if (actorStr.includes('第三者')) { el.style.backgroundColor = 'var(--color-competitor)'; el.style.color = '#fff'; }
+            else if (actorStr.includes('環境')) { el.style.backgroundColor = 'var(--color-environment)'; el.style.color = '#fff'; }
+        }
+
         let activeChapters = new Set([]);
         let activeImportances = new Set([1, 2, 3]);
         let correctArticles = new Set();
         let currentQuestion = null;
         let questionQueue = [];
         let wrongAttempted = false;
-        let showVoice = true; // ボイス表示フラグ
+        let showVoice = true;
+        let showHint = true; // 2軸ヒント表示フラグ
 
         const chapterControls = document.getElementById('chapter-controls');
         const importanceControls = document.getElementById('importance-controls');
         const voiceToggle = document.getElementById('voice-toggle');
+        const hintToggle = document.getElementById('hint-toggle');
         const minimapContainer = document.getElementById('minimap-container');
         const questionText = document.getElementById('question-text');
         const choicesArea = document.getElementById('choices-area');
         const choiceBtns = document.querySelectorAll('.choice-btn');
         const toast = document.getElementById('toast');
         
+        const architectureHub = document.getElementById('architecture-hub');
+        const badgeActor = document.getElementById('badge-actor');
+        const badgeRole = document.getElementById('badge-role');
+
         const voiceBubble = document.getElementById('voice-bubble');
         const voiceCharName = document.getElementById('voice-char-name');
         const voiceCharLine = document.getElementById('voice-char-line');
@@ -388,10 +463,14 @@
                 });
             });
 
-            // ボイス表示切り替えスイッチのイベント
             voiceToggle.addEventListener('change', (e) => {
                 showVoice = e.target.checked;
-                updateVoiceDisplay();
+                updateDisplayPanels();
+            });
+
+            hintToggle.addEventListener('change', (e) => {
+                showHint = e.target.checked;
+                updateDisplayPanels();
             });
         }
 
@@ -428,8 +507,13 @@
                     el.className = 'minimap-item';
                     el.id = `map-art-${item.article}`;
                     el.innerText = formatArticleName(item.article);
-                    el.title = formatArticleName(item.article);
+                    el.title = `${formatArticleName(item.article)} [${item.axis1_actor || '未定義'}] [${item.axis2_role || '未定義'}]`;
                     
+                    // 軸①(主体)に基づいたクラスを付与
+                    if (item.axis1_actor) {
+                        el.classList.add(getActorClass(item.axis1_actor));
+                    }
+
                     if (activeChapters.has(ch) && activeImportances.has(item.importance)) {
                         el.classList.add('active');
                     }
@@ -464,6 +548,7 @@
                 questionText.innerText = "まずは左側の「章 選択」から、勉強したい章にチェックを入れてください。";
                 choicesArea.style.display = 'none';
                 voiceBubble.style.display = 'none';
+                architectureHub.style.display = 'none';
                 currentQuestion = null;
                 return;
             }
@@ -474,6 +559,7 @@
                     questionText.innerText = "選択された条件（章・頻出度）の全問題をクリアしました！他の章や頻出度をONにしてください。";
                     choicesArea.style.display = 'none';
                     voiceBubble.style.display = 'none';
+                    architectureHub.style.display = 'none';
                     currentQuestion = null;
                     return;
                 }
@@ -482,14 +568,26 @@
             currentQuestion = questionQueue.shift();
             questionText.innerText = currentQuestion.summary;
             
-            updateVoiceDisplay();
+            updateDisplayPanels();
             renderChoices();
         }
 
-        // キャラクターセリフの表示アップデート
-        function updateVoiceDisplay() {
-            if (currentQuestion && showVoice && currentQuestion.charName && currentQuestion.charLine) {
-                voiceCharName.innerText = `📍 ${currentQuestion.address} ： ${currentQuestion.charName}`;
+        // 2軸ヒントとMTGフレーバーテキストの同時管理アップデート
+        function updateDisplayPanels() {
+            if (!currentQuestion) return;
+
+            // ① 2軸ヒントの表示制御
+            if (showHint && (currentQuestion.axis1_actor || currentQuestion.axis2_role)) {
+                setActorBadgeStyle(badgeActor, currentQuestion.axis1_actor || '未定義');
+                badgeRole.innerText = currentQuestion.axis2_role ? `code: ${currentQuestion.axis2_role}` : '未定義';
+                architectureHub.style.display = 'flex';
+            } else {
+                architectureHub.style.display = 'none';
+            }
+
+            // ② フレーバーテキスト（セリフ）の表示制御
+            if (showVoice && currentQuestion.charName && currentQuestion.charLine) {
+                voiceCharName.innerText = `📍 ${currentQuestion.address || '住所未特定'} ： ${currentQuestion.charName}`;
                 voiceCharLine.innerText = currentQuestion.charLine;
                 voiceBubble.style.display = 'block';
             } else {
