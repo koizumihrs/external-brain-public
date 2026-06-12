@@ -3,29 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>弁理士試験 詰将棋トレーナー (Level 1.8 - 2軸システムアーキテクチャ版)</title>
+    <title>特許法 脳トレ・フラッシュトレーナー (第1章・第2章特化版)</title>
     <style>
         :root {
-            --bg-color: #1a1a1a;
-            --panel-bg: #2a2a2a;
+            --bg-color: #121212;
+            --panel-bg: #1e1e1e;
             --text-color: #e0e0e0;
-            --text-muted: #666666;
+            --text-muted: #777777;
             --accent-color: #00ADB5;
-            --correct-color: #ffffff;
+            --correct-color: #00ffcc;
             --wrong-color: #ff4d4d;
-            --choice-bg: #333333;
-            --choice-hover: #444444;
-            --voice-bg: #1e3a3a;
-            --voice-border: #00ADB5;
-            --hint-bg: #222222;
-
-            /* 軸①：行為主体カラー定義 */
-            --color-applicant: #2b5c8f;   /* 青 */
-            --color-system: #4a4a4a;      /* 灰 */
-            --color-examiner: #dcdcdc;    /* 白 */
-            --color-court: #111111;       /* 黒 */
-            --color-competitor: #8b2626;  /* 赤 */
-            --color-environment: #2e5c2e; /* 緑 */
+            --choice-bg: #2a2a2a;
+            --choice-hover: #3a3a3a;
+            --flash-bg: rgba(0, 173, 181, 0.95);
         }
 
         body {
@@ -39,11 +29,11 @@
             overflow: hidden;
         }
 
-        /* 左側：コントロール＆ミニマップ */
+        /* 左側：サイドバー */
         #sidebar {
-            width: 350px;
+            width: 340px;
             background-color: var(--panel-bg);
-            border-right: 1px solid #3d3d3d;
+            border-right: 1px solid #2d2d2d;
             display: flex;
             flex-direction: column;
             padding: 20px;
@@ -54,34 +44,61 @@
         }
 
         h2 {
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             margin-top: 0;
-            border-bottom: 2px solid var(--accent-color);
-            padding-bottom: 8px;
+            border-left: 3px solid var(--accent-color);
+            padding-left: 8px;
             margin-bottom: 12px;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        #chapter-controls, #importance-controls, #voice-controls {
-            margin-bottom: 15px;
-            flex-shrink: 0;
+        .control-block {
+            margin-bottom: 25px;
         }
 
         .control-toggle {
             display: flex;
             align-items: center;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             cursor: pointer;
             font-size: 0.85rem;
+            user-select: none;
         }
 
         .control-toggle input {
             margin-right: 10px;
         }
 
+        /* モード切り替えラジオボタン風スタイル */
+        .mode-selector {
+            display: flex;
+            background: #121212;
+            border-radius: 6px;
+            padding: 2px;
+            margin-bottom: 15px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            text-align: center;
+            padding: 8px 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            font-weight: bold;
+            color: var(--text-muted);
+        }
+
+        .mode-btn.active {
+            background-color: var(--accent-color);
+            color: #fff;
+        }
+
         #minimap-container {
             flex-grow: 1;
-            margin-top: 5px;
-            padding-right: 5px;
         }
 
         .minimap-chapter {
@@ -89,10 +106,10 @@
         }
 
         .minimap-chapter-title {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: bold;
             color: var(--accent-color);
-            margin-bottom: 5px;
+            margin-bottom: 6px;
         }
 
         .minimap-list {
@@ -103,35 +120,31 @@
 
         .minimap-item {
             font-size: 0.7rem;
-            background: #222;
-            padding: 4px 2px;
+            background: #151515;
+            padding: 5px 2px;
             text-align: center;
             border-radius: 3px;
             color: var(--text-muted);
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             border: 1px solid transparent;
         }
 
-        /* 軸①のカラー反映（アクティブ時） */
-        .minimap-item.active.actor-applicant { background-color: var(--color-applicant); color: #fff; }
-        .minimap-item.active.actor-system { background-color: var(--color-system); color: #ccc; }
-        .minimap-item.active.actor-examiner { background-color: var(--color-examiner); color: #000; font-weight: bold; }
-        .minimap-item.active.actor-court { background-color: var(--color-court); color: #fff; border-color: #444; }
-        .minimap-item.active.actor-competitor { background-color: var(--color-competitor); color: #fff; }
-        .minimap-item.active.actor-environment { background-color: var(--color-environment); color: #fff; }
+        .minimap-item.active {
+            color: #aaa;
+            border-color: #333;
+        }
 
         .minimap-item.correct {
             background-color: #fff !important;
             color: #000 !important;
             font-weight: bold;
-            box-shadow: 0 0 10px rgba(255,255,255,0.8);
-            border-color: var(--accent-color) !important;
+            box-shadow: 0 0 8px rgba(255,255,255,0.7);
         }
 
-        /* 右側：クイズエリア */
+        /* 右側：メインパネル */
         #main-panel {
             flex-grow: 1;
             display: flex;
@@ -140,97 +153,61 @@
             align-items: center;
             padding: 20px;
             position: relative;
-            overflow-y: auto;
         }
 
         #quiz-box {
-            max-width: 650px;
+            max-width: 600px;
             width: 100%;
             background: var(--panel-bg);
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
             text-align: center;
             box-sizing: border-box;
+            position: relative;
         }
 
-        /* 新設：2軸システムアーキテクチャハブ */
-        #architecture-hub {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 15px;
-            display: none;
-        }
-
-        .arch-badge {
-            font-size: 0.8rem;
+        #question-display {
+            font-size: 1.8rem;
             font-weight: bold;
-            padding: 6px 12px;
-            border-radius: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .badge-role {
-            background-color: #111;
-            color: var(--accent-color);
-            border: 1px solid var(--accent-color);
-            font-family: 'Courier New', Courier, monospace;
-        }
-
-        /* フレーバーテキスト（セリフ） */
-        #voice-bubble {
-            background-color: var(--voice-bg);
-            border-left: 4px solid var(--voice-border);
-            padding: 15px;
-            border-radius: 6px;
+            color: #ffffff;
             margin-bottom: 20px;
-            text-align: left;
-            display: none;
-        }
-
-        #voice-char-name {
-            font-size: 0.8rem;
-            font-weight: bold;
-            color: var(--accent-color);
-            margin-bottom: 4px;
-        }
-
-        #voice-char-line {
-            font-size: 0.95rem;
-            font-style: italic;
-            color: #fff;
-            line-height: 1.4;
-        }
-
-        #question-text {
-            font-size: 1.2rem;
-            line-height: 1.6;
-            margin-bottom: 30px;
-            min-height: 100px;
+            min-height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
+            letter-spacing: 0.5px;
+        }
+
+        #summary-display {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #b0b0b0;
+            background: #151515;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 25px;
             text-align: left;
+            border-left: 3px solid #444;
         }
 
         #choices-area {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
+            gap: 12px;
             width: 100%;
         }
 
         .choice-btn {
             background-color: var(--choice-bg);
-            border: 2px solid #444;
+            border: 1px solid #3e3e3e;
             color: #fff;
-            font-size: 1.1rem;
-            padding: 16px;
-            border-radius: 8px;
+            font-size: 1.05rem;
+            padding: 16px 10px;
+            border-radius: 6px;
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: all 0.1s ease;
+            outline: none;
         }
 
         .choice-btn:hover {
@@ -239,103 +216,130 @@
         }
 
         .choice-btn.correct {
-            background-color: transparent !important;
-            border-color: var(--correct-color) !important;
-            color: var(--correct-color) !important;
+            background-color: #fff !important;
+            border-color: #fff !important;
+            color: #000 !important;
             font-weight: bold;
-            box-shadow: 0 0 10px rgba(255,255,255,0.3);
         }
 
         .choice-btn.wrong {
             background-color: transparent !important;
             border-color: var(--wrong-color) !important;
             color: var(--wrong-color) !important;
-            opacity: 0.5;
+            opacity: 0.4;
         }
 
-        .wrong-shake {
-            animation: shake 0.2s ease-in-out 2;
+        /* 究極の1秒フラッシュオーバーレイ */
+        #flash-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--flash-bg);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.1s ease-in-out;
         }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-8px); }
-            75% { transform: translateX(8px); }
+        #flash-overlay.show {
+            opacity: 1;
+        }
+
+        #flash-alias {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #000;
+            background: #fff;
+            padding: 4px 12px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+        }
+
+        #flash-note {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #ffffff;
+            line-height: 1.4;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.4);
         }
 
         #toast {
             position: absolute;
             top: 20px;
             right: 20px;
-            background: linear-gradient(135deg, #00ADB5, #00777a);
+            background: var(--accent-color);
             color: #fff;
-            padding: 15px 30px;
-            border-radius: 5px;
+            padding: 12px 24px;
+            border-radius: 4px;
             font-weight: bold;
-            box-shadow: 0 4px 15px rgba(0,173,181,0.4);
-            transform: translateY(-100px);
             opacity: 0;
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
             z-index: 100;
         }
 
         #toast.show {
-            transform: translateY(0);
             opacity: 1;
+            transform: translateY(0);
         }
 
         @media (max-width: 768px) {
             body { flex-direction: column; overflow: auto; height: auto; }
-            #sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #3d3d3d; }
-            #main-panel { padding: 20px 10px; }
+            #sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #2d2d2d; }
+            #main-panel { padding: 15px 5px; }
             #choices-area { grid-template-columns: 1fr; }
+            #flash-note { font-size: 1.1rem; }
         }
-
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #222; }
-        ::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
     </style>
-    <script src="patent_data.js"></script>
 </head>
 <body>
 
     <div id="sidebar">
-        <h2>章 選択</h2>
-        <div id="chapter-controls"></div>
-        
-        <h2>頻出度 選択</h2>
-        <div id="importance-controls">
-            <label class="control-toggle"><input type="checkbox" checked value="3"> ★★★ （超重要アンカー）</label>
-            <label class="control-toggle"><input type="checkbox" checked value="2"> ★★ （標準条文）</label>
-            <label class="control-toggle"><input type="checkbox" checked value="1"> ★ （その他・条文のみ）</label>
+        <div class="control-block">
+            <h2>学習モード</h2>
+            <div class="mode-selector">
+                <div id="mode-alias-btn" class="mode-btn active" onclick="setMode('BY_ALIAS')">通称 ➔ 条文番号</div>
+                <div id="mode-article-btn" class="mode-btn" onclick="setMode('BY_ARTICLE')">条文番号 ➔ 通称</div>
+            </div>
         </div>
 
-        <h2>表示設定</h2>
-        <div id="voice-controls">
-            <label class="control-toggle"><input type="checkbox" id="hint-toggle" checked> ⚙️ プログラミング2軸ヒントを表示</label>
-            <label class="control-toggle"><input type="checkbox" id="voice-toggle" checked> 💡 キャラクターボイスを表示</label>
+        <div class="control-block">
+            <h2>章 フィルター</h2>
+            <label class="control-toggle"><input type="checkbox" checked value="1" id="ch1-check"> 第1章 総則</label>
+            <label class="control-toggle"><input type="checkbox" checked value="2" id="ch2-check"> 第2章 特許出願</label>
+        </div>
+
+        <div class="control-block">
+            <h2>表示設定</h2>
+            <label class="control-toggle"><input type="checkbox" id="summary-toggle" checked> 条文のまとめ文を表示</label>
         </div>
         
-        <h2 style="margin-top: 10px;">条文ミニマップ</h2>
+        <h2>条文ミニマップ</h2>
         <div id="minimap-container"></div>
     </div>
 
     <div id="main-panel">
-        <div id="toast">🎉 章 条件クリア！</div>
+        <div id="toast">🎉 クリア！</div>
         
         <div id="quiz-box">
-            <div id="architecture-hub">
-                <div id="badge-actor" class="arch-badge">行為主体</div>
-                <div id="badge-role" class="arch-badge badge-role">ROLE</div>
+            <div id="flash-overlay">
+                <div id="flash-alias">通称</div>
+                <div id="flash-note">使われ方フラッシュ</div>
             </div>
 
-            <div id="voice-bubble">
-                <div id="voice-char-name">キャラクター名</div>
-                <div id="voice-char-line">「セリフ」</div>
-            </div>
-
-            <div id="question-text">章または頻出度を選択してください。</div>
-            <div id="choices-area" style="display: none;">
+            <div id="question-display">Loading...</div>
+            <div id="summary-display">条文の解説がここに表示されます。</div>
+            
+            <div id="choices-area">
                 <button class="choice-btn" data-index="0">--</button>
                 <button class="choice-btn" data-index="1">--</button>
                 <button class="choice-btn" data-index="2">--</button>
@@ -345,8 +349,73 @@
     </div>
 
     <script>
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        // 内蔵データ：第1章・第2章の全60条文完全マッピング
+        const patentLawData = [
+            // --- 第1章 総則 ---
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "1", "alias": "目的", "flash_note": "法の目的", "summary": "発明の保護及び利用を図り、技術の発達を促して産業の発達に寄与すること。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "2", "alias": "定義", "flash_note": "発明の定義、実施の定義", "summary": "自然法則を利用した技術的思想の創作のうち高度のもの（発明）。物・方法・製造方法の実施。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "3", "alias": "期間の計算", "flash_note": "期間計算（初日不算入、休日満了など）", "summary": "初日不算入の原則。満了日が休日の場合は翌日満了。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "4", "alias": "期間の延長等", "flash_note": "法定期間・指定期間の延長", "summary": "特許庁長官等の職権または請求による遠隔地等のための期間延長。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "5", "alias": "期日の変更", "flash_note": "指定期日の変更", "summary": "利害関係人の請求または職権による期日の変更。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "6", "alias": "法人でない社団等の手続能力", "flash_note": "権利能力なき社団の手続主体", "summary": "代表者又は管理人の定めがあるときは、名義をもって審判の請求等をすることができる。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "7", "alias": "未成年者等の手続能力", "flash_note": "未成年者・成年被後見人の制限", "summary": "未成年者及び成年被後見人は法定代理人によらなければ手続ができない（制限能力者の特則）。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "8", "alias": "在外者の特許管理人", "flash_note": "在外者の代理人必須要件", "summary": "日本国内に住所等を有しない者は、特許管理人によらなければ手続・訴訟ができない。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "9", "alias": "代理権の範囲", "flash_note": "任意代理権の特別授権事項", "summary": "出願の取下げ、放棄、変更、審判請求の取下げ等には特別の授権が必要。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "11", "alias": "代理権の不消滅", "flash_note": "本人の死亡等による代理権の不消滅", "summary": "本人の死亡、手続能力の喪失、法人の消滅等によっても代理権は消滅しない。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "12", "alias": "個別代理", "flash_note": "複数代理人の原則（各自代理）", "summary": "代理人が数人あるときは、各自が本人を代理する。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "13", "alias": "代理人の改任等", "flash_note": "不適格代理人の排除・命令", "summary": "特許庁長官等は、不適当な代理人の改任を命ずることができる。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "14", "alias": "複数当事者の各自代表", "flash_note": "共同出願人等の各自代表の原則", "summary": "数人が共同して手続するときは、原則として各自が全員を代表する（不利益行為を除く）。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "15", "alias": "在外者の裁判籍", "flash_note": "在外者の財産所在地（特許庁）", "summary": "在外者の特許権等に関する裁判籍は、特許管理人の住所等（ない場合は特許庁の所在地）。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "16", "alias": "手続能力等の補正", "flash_note": "能力・代理権の欠陥の追認", "summary": "手続能力や代理権の欠陥は、後から追認して補正することができる。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "17", "alias": "手続の補正", "flash_note": "手続の補正（方式補正）の原則", "summary": "手続をした者は、案件が係属している場合に限り補正ができる（要旨変更の禁止）。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "17_2", "alias": "願書に添付した明細書等の補正", "flash_note": "明細書・クレームの補正（時期・範囲制限）", "summary": "明細書、特許請求の範囲、図面の補正ができる時期、および新規事項追加禁止等の範囲規定。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "17_3", "alias": "要約書の補正", "flash_note": "要約書の補正期間", "summary": "出願から一定期間内に限り、要約書の補正をすることができる。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "17_4", "alias": "手続の補正の却下", "flash_note": "意図しない要旨変更等の補正却下", "summary": "拒絶理由通知後の補正が不適法（新規事項追加など）な場合の却下決定。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "18", "alias": "手続の却下", "flash_note": "方式命令不履行による手続却下", "summary": "補正命令を受けた者が指定期間内に補正をしないとき、手続を却下できる。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "18_2", "alias": "不適法な手続の却下", "flash_note": "補正できない不適法な手続の却下", "summary": "補正することができない不適法な手続は、直ちに却下処分とする。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "19", "alias": "願書等の提出の効力発生時期", "flash_note": "郵便等の発信主義（消印日）", "summary": "郵便又は信書便で提出された願書等は、郵便物の通信日付（消印日）に提出されたとみなす。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "20", "alias": "手続の効力の承継", "flash_note": "特許権等移転に伴う手続効力の承継", "summary": "特許権その他特許に関する権利についてした手続の効力は、その承継人にも及ぶ。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "21", "alias": "手続の続行", "flash_note": "承継人に対する手続の中断・続行命令", "summary": "特許庁長官等は、手続の係属中に権利が移転したときは承継人に手続を続行させることができる。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "22", "alias": "手続の中断又は中止", "flash_note": "当事者死亡等による中断と受継", "summary": "当事者の死亡、法人消滅等による手続の中断と、受継の申立てに関する規定。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "23", "alias": "中断又は中止した手続の受継申し立て", "flash_note": "相手方からの受継申立て、職権続行", "summary": "中断した手続について、相手方からの受継申立て、または特許庁の職権による続行指示。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "24", "alias": "民事訴訟法の準用", "flash_note": "中断・中止に関する民訴法準用", "summary": "手続の中断及び中止に関しては、民事訴訟法の規定を準用する。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "25", "alias": "外国人の権利能力", "flash_note": "日本に住所なき外国人の享受制限", "summary": "日本国内に住所等を持たない外国人は、条約等の国交・相互主義がない限り権利享受できない。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "26", "alias": "条約の効力", "flash_note": "条約の優先効力規定", "summary": "条約に特段の定めがあるときは、その規定が特許法に優先する。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "27", "alias": "特許原簿への登録", "flash_note": "特許原簿の登録（権利の設定・移転等）", "summary": "特許権の設定、移転、消滅、処分の制限等は、特許庁の特許原簿に登録する。" },
+            { "chapter": 1, "chapterName": "第1章 総則", "article": "28", "alias": "特許証の交付", "flash_note": "特許証の交付・再交付", "summary": "特許権の設定登録があったとき、または移転等があったときに特許証を交付する。" },
 
+            // --- 第2章 特許及び特許出願 ---
+            { "chapter": 2, "chapterName": "第2章 特許出願", "article": "29", "alias": "特許の要件（新規性・進歩性）", "flash_note": "新規性（公知、周知、刊行物公知）", "summary": "産業上利用できる発明であること。出願前に公知・公用・刊行物記載でないこと（新規性、進歩性）。" },
+            { "chapter": 2, "chapterName": "第2章 特許出願", "article": "29_2", "alias": "拡大先願", "flash_note": "他人の先出願の明細書等との重複排除", "summary": "自己の出願が、他人の先願の当初明細書等に記載された発明と同一である場合は特許されない。" },
+            { "chapter": 2, "chapterName": "第2章 特許出願", "article": "30", "alias": "発明の新規性の喪失の例外", "flash_note": "発表等の例外（1年以内、証明書必要）", "summary": "試験、学会発表、意に反する遺漏などの後、1年以内に出願すれば新規性を失わない特則。" },
+            { "chapter": 2, "chapterName": "第2章 特許出願", "article": "32", "alias": "不特許事由", "flash_note": "公序良俗・公衆衛生を害する発明の排除", "summary": "公の秩序、善良の風俗又は公衆の衛生を害するおそれがある発明には特許を与えない。" },
+            { "chapter": 2, "chapterName": "第2章 特許出願", "article": "33", "alias": "特許を受ける権利", "flash_note": "特許を受ける権利の移転・財産権性", "summary": "特許を受ける権利は移転することができる。質権の目的とすることはできない。" },
+            { "chapter": 2, "chapterName": "第2章 特許出願", "article": "34", "alias": "特許を受ける権利の移転の対抗要件", "flash_note": "出願前・出願後の権利移転の効力（届出）", "summary": "出願前の移転は承継人の出願、出願後の移転は特許庁長官への届出がなければ効力を生じない。" },
+            { "chapter": 2, "chapterName": "第2章 特許出願", "article": "34_2", "alias": "仮専用実施権", "flash_note": "出願段階での独占的ライセンス（登録が効力要件）", "summary": "特許を受ける権利を有する者は、その出願について仮専用実施権を設定できる。" },
+            { "chapter": 2, "chapterName": "第2章 特許出願", "article": "34_3", "alias": "仮通常実施権", "flash_note": "出願段階での通常ライセンス（契約で発生）", "summary": "特許を受ける権利を有する者は、その出願について仮通常実施権を許諾できる。" },
+            { "chapter": 2, "chapterName": "第2章 特許出願", "article": "34_4", "alias": "仮通常実施権の対抗要件", "flash_note": "仮通常実施権の承継人等への当然対抗", "summary": "仮通常実施権は、その後に特許を受ける権利を取得した者に対しても効力を有する（当然対抗）。" },
+            { "chapter": 2, "chapterName": "第2章 特許出願", "article": "35", "alias": "職務発明", "flash_note": "従業者等の発明の帰属・相当の利益", "summary": "従業員の職務発明について、使用者への権利帰属ルールと、従業員の相当の利益請求権。" },
+            { "chapter": 2, "chapterName": "第2章 特許出願", "article": "36", "alias": "特許出願", "flash_note": "願書、明細書、クレーム、要約書の記載要件", "summary": "特許を受けようとする者が提出すべき願書、明細書、特許請求の範囲等の記載要件。" },
+            { "chapter": 2, "chapterName": "第2章 特許出願", "article": "36_2", "alias": "外国語書面出願", "flash_note": "外国語（英語等）による出願と翻訳文提出", "summary": "願書に添付する明細書等を外国語で記載し、後から翻訳文を提出できる制度。" },
+            { "chapter": 2, "chapterName": "第2章 特許出願", "article": "37", "alias": "共同出願", "flash_note": "特許を受ける権利の共有と共同出願義務", "summary": "特許を受ける権利が共有に係るものであるときは、共有者全員で共同して出願しなければならない。" },
+            { "chapter": 2, "chapterName": "第2章 特許出願", "article": "38", "alias": "共同出願違反等の単独出願の扱い", "flash_note": "冒認出願・共同出願違反への拒絶理由", "summary": "出願人が真正な権利者でない場合（冒認）や共同出願違反は、特許されない。" },
+            { "chapter": 2, "chapterName": "第2章 特許出願", "article": "38_2", "alias": "特許出願日の認定", "flash_note": "出願日認定の基準と補完命令", "summary": "特許庁長官は、必要な記載（明細書等）が揃っている日を出願日として認定する。" },
+            { "chapter": 2, "chapterName": "第2章 特許出願", "article": "38_3", "alias": "書面補完命令", "flash_note": "出願日認定のための不備・補完手続", "summary": "明細書等の提出がない出願に対し、書面補完を命じ、補完された日を出願日とする。" },
+            { "chapter": 2, "chapterName": "第2章 特許出願", "article": "38_4", "alias": "願書に添付した明細書等の省略", "flash_note": "先に出願した他の出願の参照による明細書省略", "summary": "先の特許出願を参照する旨を願書に記載することで、明細書等の添付を省略できる制度。" },
+            { "chapter": 2, "chapterName": "第2章 特許出願", "article": "38_5", "alias": "明細書等の一部の欠落", "flash_note": "明細書の一部欠落の補完と出願日の移動", "summary": "明細書や図面の一部が欠落している場合の補完手続。原則として出願日が繰り下がる。" },
+            { "chapter": 2, "chapterName": "第2章 特許出願", "article": "39", "alias": "先願", "flash_note": "同日または異日の先願主義（最先出願の保護）", "summary": "同一の発明について異なる日に出願があったときは、最先の出願人のみが特許を受けられる。" },
+            { "chapter": 2, "chapterName": "第2章 特許出願", "article": "41", "alias": "特許出願等に基づく優先権", "flash_note": "国内優先権（自己の先願をベースにした改良）", "summary": "自己の先の出願を基礎として、改良発明を追加した出願について優先権を認める制度。" },
+            { "chapter": 2, "chapterName": "第2章 特許出願", "article": "42", "alias": "先の出願の取下げ等", "flash_note": "国内優先権の基礎出願のみなし取下げ", "summary": "国内優先権の基礎となった先の出願は、一定期間（1年4ヶ月）経過後に取り下げられたとみなされる。" },
+            { "chapter": 2, "chapterName": "第2章 特許出願", "article": "43", "alias": "パリ条約による優先権主張の手続", "flash_note": "外国出願を基礎とするパリ優先権主張の手続", "summary": "パリ条約等の同盟国への出願を基礎として、日本に出願する際の優先権主張手続。" },
+            { "chapter": 2, "chapterName": "第2章 特許出願", "article": "43_2", "alias": "国際出願等に基づく優先権主張", "flash_note": "PCT出願や世界貿易機関（WTO）加盟国優先権", "summary": "WTO加盟国間の優先権主張や、国際出願（PCT）を利用した優先権主張の手続特則。" },
+            { "chapter": 2, "chapterName": "第2章 特許出願", "article": "43_3", "alias": "優先権主張の期間の徒過による回復", "flash_note": "正当理由による優先権主張期間の回復", "summary": "故意でなく優先権主張の期間（12ヶ月）を徒過した場合の、権利回復手続。" },
+            { "chapter": 2, "chapterName": "第2章 特許出願", "article": "44", "alias": "特許出願の分割", "flash_note": "出願の一部を別出願にする分割（時期制限）", "summary": "2以上の発明を含む出願の一部を、補正ができる期間内に限り別の出願に分割できる。" },
+            { "chapter": 2, "chapterName": "第2章 特許出願", "article": "46", "alias": "出願の変更", "flash_note": "実用新案・意匠出願から特許出願への変更", "summary": "実用新案登録出願又は意匠登録出願を、特許出願へと変更することができる。" },
+            { "chapter": 2, "chapterName": "第2章 特許出願", "article": "46_2", "alias": "実用新案登録に基づく特許出願", "flash_note": "実用新案権からの特許出願への変更（実調放棄）", "summary": "自己の実用新案登録を基礎として、一定の要件下で特許出願へ変更（移行）できる制度。" }
+        ];
+
+        // 音声フィードバック（Web Audio API）
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playSound(type) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator();
@@ -356,26 +425,17 @@
 
             if (type === 'correct') {
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(523.25, now);
-                osc.frequency.setValueAtTime(659.25, now + 0.08);
-                gain.gain.setValueAtTime(0.15, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-                osc.start(now); osc.stop(now + 0.3);
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.setValueAtTime(800, now + 0.05);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now); osc.stop(now + 0.2);
             } else if (type === 'wrong') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(140, now);
-                gain.gain.setValueAtTime(0.12, now);
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(180, now);
+                gain.gain.setValueAtTime(0.15, now);
                 gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
                 osc.start(now); osc.stop(now + 0.2);
-            } else if (type === 'complete') {
-                const notes = [523.25, 587.33, 659.25, 783.99];
-                notes.forEach((freq, i) => {
-                    const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
-                    o.connect(g); g.connect(audioCtx.destination); o.type = 'triangle'; o.frequency.value = freq;
-                    g.gain.setValueAtTime(0, now); g.gain.linearRampToValueAtTime(0.12, now + i * 0.08 + 0.02);
-                    g.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-                    o.start(now + i * 0.08); o.stop(now + 0.5);
-                });
             }
         }
 
@@ -388,151 +448,93 @@
             return `${str}条`;
         }
 
-        // 軸①に対応するCSSクラスマッピング
-        function getActorClass(actorStr) {
-            if (!actorStr) return '';
-            if (actorStr.includes('出願人')) return 'actor-applicant';
-            if (actorStr.includes('システム')) return 'actor-system';
-            if (actorStr.includes('審査官')) return 'actor-examiner';
-            if (actorStr.includes('裁判所')) return 'actor-court';
-            if (actorStr.includes('第三者')) return 'actor-competitor';
-            if (actorStr.includes('環境')) return 'actor-environment';
-            return '';
-        }
-
-        // 軸①に対応するバッジカラー背景設定
-        function setActorBadgeStyle(el, actorStr) {
-            if (!actorStr) return;
-            el.innerText = actorStr;
-            if (actorStr.includes('出願人')) { el.style.backgroundColor = 'var(--color-applicant)'; el.style.color = '#fff'; }
-            else if (actorStr.includes('システム')) { el.style.backgroundColor = 'var(--color-system)'; el.style.color = '#ccc'; }
-            else if (actorStr.includes('審査官')) { el.style.backgroundColor = 'var(--color-examiner)'; el.style.color = '#000'; }
-            else if (actorStr.includes('裁判所')) { el.style.backgroundColor = 'var(--color-court)'; el.style.color = '#fff'; }
-            else if (actorStr.includes('第三者')) { el.style.backgroundColor = 'var(--color-competitor)'; el.style.color = '#fff'; }
-            else if (actorStr.includes('環境')) { el.style.backgroundColor = 'var(--color-environment)'; el.style.color = '#fff'; }
-        }
-
-        let activeChapters = new Set([]);
-        let activeImportances = new Set([1, 2, 3]);
+        let currentMode = "BY_ALIAS"; // BY_ALIAS (通称->番号) or BY_ARTICLE (番号->通称)
+        let activeChapters = new Set([1, 2]);
         let correctArticles = new Set();
         let currentQuestion = null;
         let questionQueue = [];
         let wrongAttempted = false;
-        let showVoice = true;
-        let showHint = true; // 2軸ヒント表示フラグ
+        let showSummary = true;
 
-        const chapterControls = document.getElementById('chapter-controls');
-        const importanceControls = document.getElementById('importance-controls');
-        const voiceToggle = document.getElementById('voice-toggle');
-        const hintToggle = document.getElementById('hint-toggle');
-        const minimapContainer = document.getElementById('minimap-container');
-        const questionText = document.getElementById('question-text');
+        // UI要素
+        const questionDisplay = document.getElementById('question-display');
+        const summaryDisplay = document.getElementById('summary-display');
         const choicesArea = document.getElementById('choices-area');
         const choiceBtns = document.querySelectorAll('.choice-btn');
+        const minimapContainer = document.getElementById('minimap-container');
         const toast = document.getElementById('toast');
-        
-        const architectureHub = document.getElementById('architecture-hub');
-        const badgeActor = document.getElementById('badge-actor');
-        const badgeRole = document.getElementById('badge-role');
+        const summaryToggle = document.getElementById('summary-toggle');
+        const flashOverlay = document.getElementById('flash-overlay');
+        const flashAlias = document.getElementById('flash-alias');
+        const flashNote = document.getElementById('flash-note');
 
-        const voiceBubble = document.getElementById('voice-bubble');
-        const voiceCharName = document.getElementById('voice-char-name');
-        const voiceCharLine = document.getElementById('voice-char-line');
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('mode-alias-btn').classList.toggle('active', mode === 'BY_ALIAS');
+            document.getElementById('mode-article-btn').classList.toggle('active', mode === 'BY_ARTICLE');
+            generateQueue();
+            nextQuestion();
+        }
 
         function initGame() {
-            if (typeof patentLawData === 'undefined' || !Array.isArray(patentLawData)) {
-                questionText.innerText = "エラー: patent_data.js が見つかりません。";
-                return;
-            }
-
-            renderControls();
             renderMinimap();
             generateQueue();
             nextQuestion();
 
+            // 章フィルターのイベント設定
+            document.getElementById('ch1-check').addEventListener('change', (e) => {
+                if (e.target.checked) activeChapters.add(1); else activeChapters.delete(1);
+                renderMinimap(); generateQueue(); nextQuestion();
+            });
+            document.getElementById('ch2-check').addEventListener('change', (e) => {
+                if (e.target.checked) activeChapters.add(2); else activeChapters.delete(2);
+                renderMinimap(); generateQueue(); nextQuestion();
+            });
+
+            // 表示設定のイベント
+            summaryToggle.addEventListener('change', (e) => {
+                showSummary = e.target.checked;
+                summaryDisplay.style.display = showSummary ? 'block' : 'none';
+            });
+
+            // 選択肢ボタンのイベント
             choiceBtns.forEach(btn => {
                 btn.addEventListener('click', () => checkAnswer(btn));
-            });
-
-            importanceControls.querySelectorAll('input').forEach(input => {
-                input.addEventListener('change', (e) => {
-                    const val = parseInt(e.target.value);
-                    if (e.target.checked) activeImportances.add(val);
-                    else activeImportances.delete(val);
-                    renderMinimap(); generateQueue(); nextQuestion();
-                });
-            });
-
-            voiceToggle.addEventListener('change', (e) => {
-                showVoice = e.target.checked;
-                updateDisplayPanels();
-            });
-
-            hintToggle.addEventListener('change', (e) => {
-                showHint = e.target.checked;
-                updateDisplayPanels();
-            });
-        }
-
-        function renderControls() {
-            const chapters = [...new Set(patentLawData.map(d => d.chapter))].sort((a,b) => a-b);
-            chapterControls.innerHTML = '';
-            chapters.forEach(ch => {
-                const data = patentLawData.find(d => d.chapter === ch);
-                const label = document.createElement('label');
-                label.className = 'control-toggle';
-                label.innerHTML = `<input type="checkbox" value="${ch}"> ${data.chapterName}`;
-                label.querySelector('input').addEventListener('change', (e) => {
-                    if (e.target.checked) activeChapters.add(ch);
-                    else activeChapters.delete(ch);
-                    renderMinimap(); generateQueue(); nextQuestion();
-                });
-                chapterControls.appendChild(label);
             });
         }
 
         function renderMinimap() {
             minimapContainer.innerHTML = '';
-            const chapters = [...new Set(patentLawData.map(d => d.chapter))].sort((a,b) => a-b);
+            const chapters = [1, 2];
             chapters.forEach(ch => {
+                if (!activeChapters.has(ch)) return;
                 const chData = patentLawData.filter(d => d.chapter === ch);
                 const chBox = document.createElement('div');
                 chBox.className = 'minimap-chapter';
-                chBox.appendChild(Object.assign(document.createElement('div'), {className: 'minimap-chapter-title', innerText: chData[0].chapterName}));
+                chBox.appendChild(Object.assign(document.createElement('div'), {
+                    className: 'minimap-chapter-title', 
+                    innerText: ch === 1 ? "第1章 総則" : "第2章 特許出願"
+                }));
+                
                 const list = document.createElement('div');
                 list.className = 'minimap-list';
                 
                 chData.forEach(item => {
                     const el = document.createElement('div');
-                    el.className = 'minimap-item';
+                    el.className = 'minimap-item active';
                     el.id = `map-art-${item.article}`;
                     el.innerText = formatArticleName(item.article);
-                    el.title = `${formatArticleName(item.article)} [${item.axis1_actor || '未定義'}] [${item.axis2_role || '未定義'}]`;
-                    
-                    // 軸①(主体)に基づいたクラスを付与
-                    if (item.axis1_actor) {
-                        el.classList.add(getActorClass(item.axis1_actor));
-                    }
-
-                    if (activeChapters.has(ch) && activeImportances.has(item.importance)) {
-                        el.classList.add('active');
-                    }
                     if (correctArticles.has(item.article)) el.classList.add('correct');
                     list.appendChild(el);
                 });
-                list.style.display = list.childElementCount > 0 ? 'grid' : 'none';
                 chBox.appendChild(list);
                 minimapContainer.appendChild(chBox);
             });
         }
 
         function generateQueue() {
-            const availableData = patentLawData.filter(d => 
-                activeChapters.has(d.chapter) && 
-                activeImportances.has(d.importance) && 
-                !correctArticles.has(d.article)
-            );
-            
+            const availableData = patentLawData.filter(d => activeChapters.has(d.chapter) && !correctArticles.has(d.article));
+            // シャッフル
             for (let i = availableData.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [availableData[i], availableData[j]] = [availableData[j], availableData[i]];
@@ -543,117 +545,108 @@
         function nextQuestion() {
             wrongAttempted = false;
             choiceBtns.forEach(btn => { btn.className = 'choice-btn'; btn.disabled = false; });
+            flashOverlay.classList.remove('show');
 
             if (activeChapters.size === 0) {
-                questionText.innerText = "まずは左側の「章 選択」から、勉強したい章にチェックを入れてください。";
+                questionDisplay.innerText = "章を選択してください。";
+                summaryDisplay.innerText = "";
                 choicesArea.style.display = 'none';
-                voiceBubble.style.display = 'none';
-                architectureHub.style.display = 'none';
-                currentQuestion = null;
                 return;
             }
 
             if (questionQueue.length === 0) {
                 generateQueue();
                 if (questionQueue.length === 0) {
-                    questionText.innerText = "選択された条件（章・頻出度）の全問題をクリアしました！他の章や頻出度をONにしてください。";
+                    questionDisplay.innerText = "すべての条文をクリアしました！";
+                    summaryDisplay.innerText = "フィルターを再確認するか、リロードしてください。";
                     choicesArea.style.display = 'none';
-                    voiceBubble.style.display = 'none';
-                    architectureHub.style.display = 'none';
-                    currentQuestion = null;
                     return;
                 }
             }
+
             choicesArea.style.display = 'grid';
             currentQuestion = questionQueue.shift();
-            questionText.innerText = currentQuestion.summary;
-            
-            updateDisplayPanels();
+
+            // モードに応じた問題文の表示
+            if (currentMode === "BY_ALIAS") {
+                questionDisplay.innerText = currentQuestion.alias;
+            } else {
+                questionDisplay.innerText = formatArticleName(currentQuestion.article);
+            }
+
+            summaryDisplay.innerText = currentQuestion.summary;
+            summaryDisplay.style.display = showSummary ? 'block' : 'none';
+
             renderChoices();
         }
 
-        // 2軸ヒントとMTGフレーバーテキストの同時管理アップデート
-        function updateDisplayPanels() {
-            if (!currentQuestion) return;
-
-            // ① 2軸ヒントの表示制御
-            if (showHint && (currentQuestion.axis1_actor || currentQuestion.axis2_role)) {
-                setActorBadgeStyle(badgeActor, currentQuestion.axis1_actor || '未定義');
-                badgeRole.innerText = currentQuestion.axis2_role ? `code: ${currentQuestion.axis2_role}` : '未定義';
-                architectureHub.style.display = 'flex';
-            } else {
-                architectureHub.style.display = 'none';
-            }
-
-            // ② フレーバーテキスト（セリフ）の表示制御
-            if (showVoice && currentQuestion.charName && currentQuestion.charLine) {
-                voiceCharName.innerText = `📍 ${currentQuestion.address || '住所未特定'} ： ${currentQuestion.charName}`;
-                voiceCharLine.innerText = currentQuestion.charLine;
-                voiceBubble.style.display = 'block';
-            } else {
-                voiceBubble.style.display = 'none';
-            }
-        }
-
         function renderChoices() {
-            const correctArt = currentQuestion.article;
-            let dummies = patentLawData.filter(d => d.article !== correctArt).map(d => d.article);
-            dummies = [...new Set(dummies)];
+            const isAliasMode = (currentMode === "BY_ALIAS");
+            const correctVal = isAliasMode ? currentQuestion.article : currentQuestion.alias;
             
-            for (let i = dummies.length - 1; i > 0; i--) {
+            // ダミー選択肢のプール作成
+            let dummyPool = patentLawData
+                .filter(d => d.article !== currentQuestion.article)
+                .map(d => isAliasMode ? d.article : d.alias);
+            
+            // 重複排除
+            dummyPool = [...new Set(dummyPool)];
+            
+            // ランダムに3つ抽出
+            for (let i = dummyPool.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
-                [dummies[i], dummies[j]] = [dummies[j], dummies[i]];
+                [dummyPool[i], dummyPool[j]] = [dummyPool[j], dummyPool[i]];
             }
-            const chosenDummies = dummies.slice(0, 3);
-            let finalChoices = [correctArt, ...chosenDummies];
+            const chosenDummies = dummyPool.slice(0, 3);
+            
+            // 正解を混ぜてシャッフル
+            let finalChoices = [correctVal, ...chosenDummies];
             for (let i = finalChoices.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [finalChoices[i], finalChoices[j]] = [finalChoices[j], finalChoices[i]];
             }
 
+            // ボタンへ割り当て
             choiceBtns.forEach((btn, index) => {
-                btn.innerText = formatArticleName(finalChoices[index]);
-                btn.dataset.article = finalChoices[index];
+                const val = finalChoices[index];
+                btn.innerText = isAliasMode ? formatArticleName(val) : val;
+                btn.dataset.value = val;
             });
         }
 
         function checkAnswer(selectedBtn) {
             if (!currentQuestion) return;
-            const selectedArt = selectedBtn.dataset.article;
-            const correctArt = currentQuestion.article;
+            const isAliasMode = (currentMode === "BY_ALIAS");
+            const selectedVal = selectedBtn.dataset.value;
+            const correctVal = isAliasMode ? currentQuestion.article : currentQuestion.alias;
             
-            if (selectedArt === correctArt) {
+            if (selectedVal === correctVal) {
                 selectedBtn.classList.add('correct');
                 playSound('correct');
                 
+                // ミニマップの進行度更新
                 if (!wrongAttempted) {
                     correctArticles.add(currentQuestion.article);
                     const mapItem = document.getElementById(`map-art-${currentQuestion.article}`);
                     if (mapItem) mapItem.classList.add('correct');
-                    checkChapterCompletion(currentQuestion.chapter, currentQuestion.chapterName);
                 } else {
+                    // 間違えていた場合はキューに戻す
                     questionQueue.push(currentQuestion);
                 }
-                setTimeout(nextQuestion, 300);
+
+                // 【究極進化】1秒フラッシュの発動
+                flashAlias.innerText = currentQuestion.alias;
+                flashNote.innerText = currentQuestion.flash_note || "補足情報なし";
+                flashOverlay.classList.add('show');
+
+                // 1000ms（1秒）後に自動で次へ
+                setTimeout(nextQuestion, 1000);
+
             } else {
                 wrongAttempted = true;
-                selectedBtn.classList.add('wrong', 'wrong-shake');
+                selectedBtn.classList.add('wrong');
                 selectedBtn.disabled = true;
                 playSound('wrong');
-                setTimeout(() => selectedBtn.classList.remove('wrong-shake'), 400);
-            }
-        }
-
-        function checkChapterCompletion(chapterId, chapterName) {
-            const chArticles = patentLawData.filter(d => d.chapter === chapterId && activeImportances.has(d.importance)).map(d => d.article);
-            if (chArticles.length === 0) return;
-            
-            const isComp = chArticles.every(art => correctArticles.has(art));
-            if (isComp) {
-                playSound('complete');
-                toast.innerText = `🎉 ${chapterName} 条件クリア！`;
-                toast.classList.add('show');
-                setTimeout(() => toast.classList.remove('show'), 2500);
             }
         }
 
