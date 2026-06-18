@@ -229,7 +229,7 @@
             opacity: 0.4;
         }
 
-        /* 1秒フラッシュオーバーレイ */
+        /* 5秒フラッシュオーバーレイ */
         #flash-overlay {
             position: absolute;
             top: 0;
@@ -590,8 +590,8 @@
                 flashNote.innerText = currentQuestion.flash_note || "補足情報なし";
                 flashOverlay.classList.add('show');
 
-                // 1秒後に自動で次の問題へ
-                setTimeout(nextQuestion, 1000);
+                // 5秒後に自動で次の問題へ
+                setTimeout(nextQuestion, 5000);
 
             } else {
                 wrongAttempted = true;
