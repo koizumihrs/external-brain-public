@@ -585,9 +585,9 @@
                     questionQueue.push(currentQuestion);
                 }
 
-                // flash_note と summary が共通なのでそのまま表示
+                // フラッシュと解説は summary を共用
                 flashAlias.innerText = currentQuestion.alias;
-                flashNote.innerText = currentQuestion.flash_note || "補足情報なし";
+                flashNote.innerText = currentQuestion.summary || "補足情報なし";
                 flashOverlay.classList.add('show');
 
                 // 5秒後に自動で次の問題へ
