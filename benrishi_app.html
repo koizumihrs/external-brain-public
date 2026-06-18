@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>特許法 脳トレ・フラッシュトレーナー (第1章・第2章特化版)</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --panel-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --text-muted: #777777;
+            --accent-color: #00ADB5;
+            --correct-color: #00ffcc;
+            --wrong-color: #ff4d4d;
+            --choice-bg: #2a2a2a;
+            --choice-hover: #3a3a3a;
+            --flash-bg: rgba(0, 173, 181, 0.95);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 左側：サイドバー */
+        #sidebar {
+            width: 340px;
+            background-color: var(--panel-bg);
+            border-right: 1px solid #2d2d2d;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+            height: 100vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        h2 {
+            font-size: 0.95rem;
+            margin-top: 0;
+            border-left: 3px solid var(--accent-color);
+            padding-left: 8px;
+            margin-bottom: 12px;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .control-block {
+            margin-bottom: 25px;
+        }
+
+        .control-toggle {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            user-select: none;
+        }
+
+        .control-toggle input {
+            margin-right: 10px;
+        }
+
+        /* モード切り替えスタイル */
+        .mode-selector {
+            display: flex;
+            background: #121212;
+            border-radius: 6px;
+            padding: 2px;
+            margin-bottom: 15px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            text-align: center;
+            padding: 8px 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            font-weight: bold;
+            color: var(--text-muted);
+        }
+
+        .mode-btn.active {
+            background-color: var(--accent-color);
+            color: #fff;
+        }
+
+        #minimap-container {
+            flex-grow: 1;
+        }
+
+        .minimap-chapter {
+            margin-bottom: 15px;
+        }
+
+        .minimap-chapter-title {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 6px;
+        }
+
+        .minimap-list {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
+        }
+
+        .minimap-item {
+            font-size: 0.7rem;
+            background: #151515;
+            padding: 5px 2px;
+            text-align: center;
+            border-radius: 3px;
+            color: var(--text-muted);
+            transition: all 0.15s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            border: 1px solid transparent;
+        }
+
+        .minimap-item.active {
+            color: #aaa;
+            border-color: #333;
+        }
+
+        .minimap-item.correct {
+            background-color: #fff !important;
+            color: #000 !important;
+            font-weight: bold;
+            box-shadow: 0 0 8px rgba(255,255,255,0.7);
+        }
+
+        /* 右側：メインパネル */
+        #main-panel {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        #quiz-box {
+            max-width: 600px;
+            width: 100%;
+            background: var(--panel-bg);
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+            text-align: center;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        #question-display {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 20px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            letter-spacing: 0.5px;
+        }
+
+        #summary-display {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #b0b0b0;
+            background: #151515;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            text-align: left;
+            border-left: 3px solid #444;
+        }
+
+        #choices-area {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            width: 100%;
+        }
+
+        .choice-btn {
+            background-color: var(--choice-bg);
+            border: 1px solid #3e3e3e;
+            color: #fff;
+            font-size: 1.05rem;
+            padding: 16px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            outline: none;
+        }
+
+        .choice-btn:hover {
+            background-color: var(--choice-hover);
+            border-color: #555;
+        }
+
+        .choice-btn.correct {
+            background-color: #fff !important;
+            border-color: #fff !important;
+            color: #000 !important;
+            font-weight: bold;
+        }
+
+        .choice-btn.wrong {
+            background-color: transparent !important;
+            border-color: var(--wrong-color) !important;
+            color: var(--wrong-color) !important;
+            opacity: 0.4;
+        }
+
+        /* 1秒フラッシュオーバーレイ */
+        #flash-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--flash-bg);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.1s ease-in-out;
+        }
+
+        #flash-overlay.show {
+            opacity: 1;
+        }
+
+        #flash-alias {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #000;
+            background: #fff;
+            padding: 4px 12px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+        }
+
+        #flash-note {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #ffffff;
+            line-height: 1.4;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+        }
+
+        #toast {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--accent-color);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-weight: bold;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        #toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; overflow: auto; height: auto; }
+            #sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #2d2d2d; }
+            #main-panel { padding: 15px 5px; }
+            #choices-area { grid-template-columns: 1fr; }
+            #flash-note { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar">
+        <div class="control-block">
+            <h2>学習モード</h2>
+            <div class="mode-selector">
+                <div id="mode-alias-btn" class="mode-btn active" onclick="setMode('BY_ALIAS')">通称 ➔ 条文番号</div>
+                <div id="mode-article-btn" class="mode-btn" onclick="setMode('BY_ARTICLE')">条文番号 ➔ 通称</div>
+            </div>
+        </div>
+
+        <div class="control-block">
+            <h2>章 フィルター</h2>
+            <label class="control-toggle"><input type="checkbox" checked value="1" id="ch1-check"> 第1章 総則</label>
+            <label class="control-toggle"><input type="checkbox" checked value="2" id="ch2-check"> 第2章 特許出願</label>
+        </div>
+
+        <div class="control-block">
+            <h2>表示設定</h2>
+            <label class="control-toggle"><input type="checkbox" id="summary-toggle" checked> 条文のまとめ文を表示</label>
+        </div>
+        
+        <h2>条文ミニマップ</h2>
+        <div id="minimap-container"></div>
+    </div>
+
+    <div id="main-panel">
+        <div id="toast">🎉 クリア！</div>
+        
+        <div id="quiz-box">
+            <div id="flash-overlay">
+                <div id="flash-alias">通称</div>
+                <div id="flash-note">使われ方フラッシュ</div>
+            </div>
+
+            <div id="question-display">Loading...</div>
+            <div id="summary-display">条文の解説がここに表示されます。</div>
+            
+            <div id="choices-area">
+                <button class="choice-btn" data-index="0">--</button>
+                <button class="choice-btn" data-index="1">--</button>
+                <button class="choice-btn" data-index="2">--</button>
+                <button class="choice-btn" data-index="3">--</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 音声フィードバック（Web Audio API）
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.setValueAtTime(800, now + 0.05);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now); osc.stop(now + 0.2);
+            } else if (type === 'wrong') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(180, now);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now); osc.stop(now + 0.2);
+            }
+        }
+
+        function formatArticleName(artStr) {
+            const str = String(artStr);
+            if (str.includes('_')) {
+                const parts = str.split('_');
+                return `${parts[0]}条の${parts[1]}`;
+            }
+            return `${str}条`;
+        }
+
+        let patentLawData = []; // 外部JSONから読み込む
+        let currentMode = "BY_ALIAS";
+        let activeChapters = new Set([1, 2]);
+        let correctArticles = new Set();
+        let currentQuestion = null;
+        let questionQueue = [];
+        let wrongAttempted = false;
+        let showSummary = true;
+
+        // UI要素
+        const questionDisplay = document.getElementById('question-display');
+        const summaryDisplay = document.getElementById('summary-display');
+        const choicesArea = document.getElementById('choices-area');
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const minimapContainer = document.getElementById('minimap-container');
+        const toast = document.getElementById('toast');
+        const summaryToggle = document.getElementById('summary-toggle');
+        const flashOverlay = document.getElementById('flash-overlay');
+        const flashAlias = document.getElementById('flash-alias');
+        const flashNote = document.getElementById('flash-note');
+
+        // 外部JSONデータの読み込み
+        async function loadData() {
+            try {
+                const response = await fetch('patent_data.json');
+                if (!response.ok) throw new Error('JSONの読み込みに失敗しました');
+                patentLawData = await response.json();
+                initGame();
+            } catch (error) {
+                questionDisplay.innerText = "データ読み込みエラー";
+                summaryDisplay.innerText = "同じフォルダに 'patent_data.json' が正しく配置されているか確認してください。";
+                choicesArea.style.display = 'none';
+                console.error(error);
+            }
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('mode-alias-btn').classList.toggle('active', mode === 'BY_ALIAS');
+            document.getElementById('mode-article-btn').classList.toggle('active', mode === 'BY_ARTICLE');
+            generateQueue();
+            nextQuestion();
+        }
+
+        function initGame() {
+            renderMinimap();
+            generateQueue();
+            nextQuestion();
+
+            // 章フィルターのイベント設定
+            document.getElementById('ch1-check').addEventListener('change', (e) => {
+                if (e.target.checked) activeChapters.add(1); else activeChapters.delete(1);
+                renderMinimap(); generateQueue(); nextQuestion();
+            });
+            document.getElementById('ch2-check').addEventListener('change', (e) => {
+                if (e.target.checked) activeChapters.add(2); else activeChapters.delete(2);
+                renderMinimap(); generateQueue(); nextQuestion();
+            });
+
+            // 表示設定のイベント
+            summaryToggle.addEventListener('change', (e) => {
+                showSummary = e.target.checked;
+                summaryDisplay.style.display = showSummary ? 'block' : 'none';
+            });
+
+            // 選択肢ボタンのイベント
+            choiceBtns.forEach(btn => {
+                btn.addEventListener('click', () => checkAnswer(btn));
+            });
+        }
+
+        function renderMinimap() {
+            minimapContainer.innerHTML = '';
+            const chapters = [1, 2];
+            chapters.forEach(ch => {
+                if (!activeChapters.has(ch)) return;
+                const chData = patentLawData.filter(d => d.chapter === ch);
+                const chBox = document.createElement('div');
+                chBox.className = 'minimap-chapter';
+                chBox.appendChild(Object.assign(document.createElement('div'), {
+                    className: 'minimap-chapter-title', 
+                    innerText: ch === 1 ? "第1章 総則" : "第2章 特許及び特許出願"
+                }));
+                
+                const list = document.createElement('div');
+                list.className = 'minimap-list';
+                
+                chData.forEach(item => {
+                    const el = document.createElement('div');
+                    el.className = 'minimap-item active';
+                    el.id = `map-art-${item.article}`;
+                    el.innerText = formatArticleName(item.article);
+                    if (correctArticles.has(item.article)) el.classList.add('correct');
+                    list.appendChild(el);
+                });
+                chBox.appendChild(list);
+                minimapContainer.appendChild(chBox);
+            });
+        }
+
+        function generateQueue() {
+            const availableData = patentLawData.filter(d => activeChapters.has(d.chapter) && !correctArticles.has(d.article));
+            // シャッフル
+            for (let i = availableData.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [availableData[i], availableData[j]] = [availableData[j], availableData[i]];
+            }
+            questionQueue = availableData;
+        }
+
+        function nextQuestion() {
+            wrongAttempted = false;
+            choiceBtns.forEach(btn => { btn.className = 'choice-btn'; btn.disabled = false; });
+            flashOverlay.classList.remove('show');
+
+            if (activeChapters.size === 0) {
+                questionDisplay.innerText = "章を選択してください。";
+                summaryDisplay.innerText = "";
+                choicesArea.style.display = 'none';
+                return;
+            }
+
+            if (questionQueue.length === 0) {
+                generateQueue();
+                if (questionQueue.length === 0) {
+                    questionDisplay.innerText = "すべての条文をクリアしました！";
+                    summaryDisplay.innerText = "フィルターを再確認するか、リロードしてください。";
+                    choicesArea.style.display = 'none';
+                    return;
+                }
+            }
+
+            choicesArea.style.display = 'grid';
+            currentQuestion = questionQueue.shift();
+
+            // モードに応じた問題文の表示
+            if (currentMode === "BY_ALIAS") {
+                questionDisplay.innerText = currentQuestion.alias;
+            } else {
+                questionDisplay.innerText = formatArticleName(currentQuestion.article);
+            }
+
+            summaryDisplay.innerText = currentQuestion.summary;
+            summaryDisplay.style.display = showSummary ? 'block' : 'none';
+
+            renderChoices();
+        }
+
+        function renderChoices() {
+            const isAliasMode = (currentMode === "BY_ALIAS");
+            const correctVal = isAliasMode ? currentQuestion.article : currentQuestion.alias;
+            
+            // ダミー選択肢のプール作成
+            let dummyPool = patentLawData
+                .filter(d => d.article !== currentQuestion.article)
+                .map(d => isAliasMode ? d.article : d.alias);
+            
+            // 重複排除
+            dummyPool = [...new Set(dummyPool)];
+            
+            // ランダムに3つ抽出
+            for (let i = dummyPool.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [dummyPool[i], dummyPool[j]] = [dummyPool[j], dummyPool[i]];
+            }
+            const chosenDummies = dummyPool.slice(0, 3);
+            
+            // 正解を混ぜてシャッフル
+            let finalChoices = [correctVal, ...chosenDummies];
+            for (let i = finalChoices.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [finalChoices[i], finalChoices[j]] = [finalChoices[j], finalChoices[i]];
+            }
+
+            // ボタンへ割り当て
+            choiceBtns.forEach((btn, index) => {
+                const val = finalChoices[index];
+                btn.innerText = isAliasMode ? formatArticleName(val) : val;
+                btn.dataset.value = val;
+            });
+        }
+
+        function checkAnswer(selectedBtn) {
+            if (!currentQuestion) return;
+            const isAliasMode = (currentMode === "BY_ALIAS");
+            const selectedVal = selectedBtn.dataset.value;
+            const correctVal = isAliasMode ? currentQuestion.article : currentQuestion.alias;
+            
+            if (selectedVal === correctVal) {
+                selectedBtn.classList.add('correct');
+                playSound('correct');
+                
+                // ミニマップの進行度更新
+                if (!wrongAttempted) {
+                    correctArticles.add(currentQuestion.article);
+                    const mapItem = document.getElementById(`map-art-${currentQuestion.article}`);
+                    if (mapItem) mapItem.classList.add('correct');
+                } else {
+                    // 間違えていた場合はキューに戻す
+                    questionQueue.push(currentQuestion);
+                }
+
+                // flash_note と summary が共通なのでそのまま表示
+                flashAlias.innerText = currentQuestion.alias;
+                flashNote.innerText = currentQuestion.flash_note || "補足情報なし";
+                flashOverlay.classList.add('show');
+
+                // 1秒後に自動で次の問題へ
+                setTimeout(nextQuestion, 1000);
+
+            } else {
+                wrongAttempted = true;
+                selectedBtn.classList.add('wrong');
+                selectedBtn.disabled = true;
+                playSound('wrong');
+            }
+        }
+
+        // 起動時にロードを開始
+        window.onload = loadData;
+    </script>
+</body>
+</html>
