@@ -4,13 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>特許法 脳トレ・フラッシュトレーナー (第1章・第2章特化版)</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#00ADB5">
-    <link rel="icon" href="icon-192.png">
-    <link rel="apple-touch-icon" href="icon-192.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="特許法トレーナー">
     <style>
         :root {
             --bg-color: #121212;
@@ -329,13 +322,6 @@
             <h2>表示設定</h2>
             <label class="control-toggle"><input type="checkbox" id="summary-toggle" checked> 条文のまとめ文を表示</label>
         </div>
-
-        <div class="control-block">
-            <h2>利用時間</h2>
-            <div id="today-time-display" style="font-size: 1.3rem; font-weight: bold; color: #fff; margin-bottom: 8px;">0.0分</div>
-            <div style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 4px;">直近の履歴</div>
-            <div id="time-history-list" style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.6;"></div>
-        </div>
         
         <h2>条文ミニマップ</h2>
         <div id="minimap-container"></div>
@@ -613,93 +599,6 @@
                 selectedBtn.disabled = true;
                 playSound('wrong');
             }
-        }
-
-        // ===== 利用時間トラッキング =====
-        function todayKey(d = new Date()) {
-            const tz = d.getTimezoneOffset() * 60000;
-            return new Date(d.getTime() - tz).toISOString().slice(0, 10);
-        }
-
-        function addElapsedTime(ms) {
-            const key = 'studyTime_' + todayKey();
-            const prev = parseInt(localStorage.getItem(key) || '0', 10);
-            localStorage.setItem(key, String(prev + ms));
-        }
-
-        function getMinutesForDate(dateStr) {
-            const ms = parseInt(localStorage.getItem('studyTime_' + dateStr) || '0', 10);
-            return ms / 60000;
-        }
-
-        let trackingStart = null;
-
-        function isPageActive() {
-            return !document.hidden && document.hasFocus();
-        }
-
-        function startTracking() {
-            if (trackingStart === null) trackingStart = Date.now();
-        }
-
-        function stopTracking() {
-            if (trackingStart !== null) {
-                addElapsedTime(Date.now() - trackingStart);
-                trackingStart = null;
-            }
-        }
-
-        function updateTimeDisplay() {
-            const todayMs = parseInt(localStorage.getItem('studyTime_' + todayKey()) || '0', 10);
-            const liveMs = trackingStart !== null ? (Date.now() - trackingStart) : 0;
-            const totalMin = (todayMs + liveMs) / 60000;
-            const display = document.getElementById('today-time-display');
-            if (display) display.innerText = `${totalMin.toFixed(1)}分`;
-        }
-
-        function renderTimeHistory() {
-            const list = document.getElementById('time-history-list');
-            if (!list) return;
-            list.innerHTML = '';
-            for (let i = 1; i <= 6; i++) {
-                const d = new Date();
-                d.setDate(d.getDate() - i);
-                const mins = getMinutesForDate(todayKey(d));
-                const row = document.createElement('div');
-                row.innerText = `${d.getMonth() + 1}/${d.getDate()}: ${mins.toFixed(1)}分`;
-                list.appendChild(row);
-            }
-        }
-
-        // タブ切り替え・ウィンドウのフォーカス変化を検知して計測をON/OFF
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) stopTracking();
-            else if (isPageActive()) startTracking();
-        });
-        window.addEventListener('focus', () => { if (!document.hidden) startTracking(); });
-        window.addEventListener('blur', stopTracking);
-        window.addEventListener('pagehide', stopTracking);
-        window.addEventListener('beforeunload', stopTracking);
-
-        // 5秒ごとに保存・表示を更新（強制終了時のデータ消失を防ぐ）
-        setInterval(() => {
-            if (trackingStart !== null) {
-                stopTracking();
-                startTracking();
-            }
-            updateTimeDisplay();
-            renderTimeHistory();
-        }, 5000);
-
-        if (isPageActive()) startTracking();
-        updateTimeDisplay();
-        renderTimeHistory();
-
-        // ===== Service Worker 登録（インストール可能化・オフライン対応） =====
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('service-worker.js').catch(console.error);
-            });
         }
 
         // 起動時にロードを開始
