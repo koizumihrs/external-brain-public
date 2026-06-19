@@ -323,7 +323,6 @@
             <h2>章 フィルター</h2>
             <label class="control-toggle"><input type="checkbox" checked value="1" id="ch1-check"> 第1章 総則</label>
             <label class="control-toggle"><input type="checkbox" checked value="2" id="ch2-check"> 第2章 特許出願</label>
-            <label class="control-toggle"><input type="checkbox" checked value="3" id="ch3-check"> 第3章 審査</label>
         </div>
 
         <div class="control-block">
@@ -401,7 +400,7 @@
 
         let patentLawData = []; // 外部JSONから読み込む
         let currentMode = "BY_ALIAS";
-        let activeChapters = new Set([1, 2, 3]);
+        let activeChapters = new Set([1, 2]);
         let correctArticles = new Set();
         let currentQuestion = null;
         let questionQueue = [];
@@ -457,10 +456,6 @@
                 if (e.target.checked) activeChapters.add(2); else activeChapters.delete(2);
                 renderMinimap(); generateQueue(); nextQuestion();
             });
-            document.getElementById('ch3-check').addEventListener('change', (e) => {
-                if (e.target.checked) activeChapters.add(3); else activeChapters.delete(3);
-                renderMinimap(); generateQueue(); nextQuestion();
-            });
 
             // 表示設定のイベント
             summaryToggle.addEventListener('change', (e) => {
@@ -476,7 +471,7 @@
 
         function renderMinimap() {
             minimapContainer.innerHTML = '';
-            const chapters = [...new Set(patentLawData.map(d => d.chapter))].sort((a, b) => a - b);
+            const chapters = [1, 2];
             chapters.forEach(ch => {
                 if (!activeChapters.has(ch)) return;
                 const chData = patentLawData.filter(d => d.chapter === ch);
@@ -484,7 +479,7 @@
                 chBox.className = 'minimap-chapter';
                 chBox.appendChild(Object.assign(document.createElement('div'), {
                     className: 'minimap-chapter-title', 
-                    innerText: chData[0].chapterName
+                    innerText: ch === 1 ? "第1章 総則" : "第2章 特許及び特許出願"
                 }));
                 
                 const list = document.createElement('div');
