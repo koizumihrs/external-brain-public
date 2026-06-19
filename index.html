@@ -334,7 +334,8 @@
             <h2>利用時間</h2>
             <div id="today-time-display" style="font-size: 1.3rem; font-weight: bold; color: #fff; margin-bottom: 8px;">0.0分</div>
             <div style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 4px;">直近の履歴</div>
-            <div id="time-history-list" style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.6;"></div>
+            <div id="time-history-list" style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 10px;"></div>
+            <button id="export-log-btn" style="width: 100%; padding: 8px; background: var(--accent-color); border: none; border-radius: 4px; color: #fff; font-size: 0.8rem; font-weight: bold; cursor: pointer;">ログをダウンロード(.md)</button>
         </div>
         
         <h2>条文ミニマップ</h2>
@@ -671,6 +672,73 @@
             }
         }
 
+        function getMondayOfWeek(dateStr) {
+            const d = new Date(dateStr + 'T00:00:00');
+            const day = d.getDay(); // 0=日, 1=月, ...
+            const diff = (day === 0 ? -6 : 1 - day);
+            d.setDate(d.getDate() + diff);
+            return todayKey(d);
+        }
+
+        function exportTimeLogAsMarkdown() {
+            const entries = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('studyTime_')) {
+                    const dateStr = key.slice('studyTime_'.length);
+                    const ms = parseInt(localStorage.getItem(key) || '0', 10);
+                    entries.push({ date: dateStr, minutes: ms / 60000 });
+                }
+            }
+
+            if (entries.length === 0) {
+                alert('まだ記録がありません。');
+                return;
+            }
+
+            entries.sort((a, b) => a.date.localeCompare(b.date));
+
+            const weekTotals = new Map();
+            const monthTotals = new Map();
+            entries.forEach(({ date, minutes }) => {
+                const monday = getMondayOfWeek(date);
+                weekTotals.set(monday, (weekTotals.get(monday) || 0) + minutes);
+                const month = date.slice(0, 7);
+                monthTotals.set(month, (monthTotals.get(month) || 0) + minutes);
+            });
+
+            const totalMinutes = entries.reduce((sum, e) => sum + e.minutes, 0);
+
+            let md = `# 特許法トレーナー 学習時間ログ\n\n`;
+            md += `エクスポート日時: ${new Date().toLocaleString('ja-JP')}\n\n`;
+            md += `合計学習時間: ${totalMinutes.toFixed(1)}分（${entries.length}日分）\n\n`;
+
+            md += `## 月別\n\n| 月 | 分 |\n|---|---|\n`;
+            [...monthTotals.entries()].sort((a, b) => a[0].localeCompare(b[0])).forEach(([month, mins]) => {
+                md += `| ${month} | ${mins.toFixed(1)} |\n`;
+            });
+
+            md += `\n## 週別（月曜始まり）\n\n| 週開始日 | 分 |\n|---|---|\n`;
+            [...weekTotals.entries()].sort((a, b) => a[0].localeCompare(b[0])).forEach(([week, mins]) => {
+                md += `| ${week} | ${mins.toFixed(1)} |\n`;
+            });
+
+            md += `\n## 日別\n\n| 日付 | 分 |\n|---|---|\n`;
+            entries.forEach(({ date, minutes }) => {
+                md += `| ${date} | ${minutes.toFixed(1)} |\n`;
+            });
+
+            const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `studytime_log_${todayKey()}.md`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
         // タブ切り替え・ウィンドウのフォーカス変化を検知して計測をON/OFF
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) stopTracking();
@@ -694,6 +762,9 @@
         if (isPageActive()) startTracking();
         updateTimeDisplay();
         renderTimeHistory();
+
+        const exportBtn = document.getElementById('export-log-btn');
+        if (exportBtn) exportBtn.addEventListener('click', exportTimeLogAsMarkdown);
 
         // ===== Service Worker 登録（インストール可能化・オフライン対応） =====
         if ('serviceWorker' in navigator) {
