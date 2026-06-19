@@ -142,6 +142,13 @@
         .minimap-item.active {
             color: #aaa;
             border-color: #333;
+            cursor: pointer;
+        }
+
+        .minimap-item.focused {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            background-color: rgba(0, 173, 181, 0.15);
         }
 
         .minimap-item.correct {
@@ -327,6 +334,12 @@
         </div>
 
         <div class="control-block">
+            <h2>重点登録</h2>
+            <label class="control-toggle"><input type="checkbox" id="focus-mode-toggle"> 登録した条文だけ出題する</label>
+            <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">ミニマップの条文名をタップで登録/解除</div>
+        </div>
+
+        <div class="control-block">
             <h2>表示設定</h2>
             <label class="control-toggle"><input type="checkbox" id="summary-toggle" checked> 条文のまとめ文を表示</label>
         </div>
@@ -403,10 +416,16 @@
         let currentMode = "BY_ALIAS";
         let activeChapters = new Set([1, 2, 3]);
         let correctArticles = new Set();
+        let focusedArticles = new Set(JSON.parse(localStorage.getItem('focusedArticles') || '[]'));
+        let focusModeOnly = false;
         let currentQuestion = null;
         let questionQueue = [];
         let wrongAttempted = false;
         let showSummary = true;
+
+        function saveFocusedArticles() {
+            localStorage.setItem('focusedArticles', JSON.stringify([...focusedArticles]));
+        }
 
         // UI要素
         const questionDisplay = document.getElementById('question-display');
@@ -461,6 +480,10 @@
                 if (e.target.checked) activeChapters.add(3); else activeChapters.delete(3);
                 renderMinimap(); generateQueue(); nextQuestion();
             });
+            document.getElementById('focus-mode-toggle').addEventListener('change', (e) => {
+                focusModeOnly = e.target.checked;
+                generateQueue(); nextQuestion();
+            });
 
             // 表示設定のイベント
             summaryToggle.addEventListener('change', (e) => {
@@ -495,7 +518,19 @@
                     el.className = 'minimap-item active';
                     el.id = `map-art-${item.article}`;
                     el.innerText = formatArticleName(item.article);
+                    if (focusedArticles.has(item.article)) el.classList.add('focused');
                     if (correctArticles.has(item.article)) el.classList.add('correct');
+                    el.addEventListener('click', () => {
+                        if (focusedArticles.has(item.article)) {
+                            focusedArticles.delete(item.article);
+                            el.classList.remove('focused');
+                        } else {
+                            focusedArticles.add(item.article);
+                            el.classList.add('focused');
+                        }
+                        saveFocusedArticles();
+                        if (focusModeOnly) { generateQueue(); }
+                    });
                     list.appendChild(el);
                 });
                 chBox.appendChild(list);
@@ -504,7 +539,11 @@
         }
 
         function generateQueue() {
-            const availableData = patentLawData.filter(d => activeChapters.has(d.chapter) && !correctArticles.has(d.article));
+            const availableData = patentLawData.filter(d =>
+                activeChapters.has(d.chapter) &&
+                !correctArticles.has(d.article) &&
+                (!focusModeOnly || focusedArticles.has(d.article))
+            );
             // シャッフル
             for (let i = availableData.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -521,6 +560,13 @@
             if (activeChapters.size === 0) {
                 questionDisplay.innerText = "章を選択してください。";
                 summaryDisplay.innerText = "";
+                choicesArea.style.display = 'none';
+                return;
+            }
+
+            if (focusModeOnly && focusedArticles.size === 0) {
+                questionDisplay.innerText = "重点条文が登録されていません。";
+                summaryDisplay.innerText = "ミニマップの条文名をタップして登録してください。";
                 choicesArea.style.display = 'none';
                 return;
             }
