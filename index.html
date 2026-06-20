@@ -656,8 +656,8 @@
                 flashNote.innerText = currentQuestion.summary || "補足情報なし";
                 flashOverlay.classList.add('show');
 
-                // 5秒後に自動で次の問題へ
-                setTimeout(nextQuestion, 5000);
+                // 0秒後に自動で次の問題へ
+                setTimeout(nextQuestion, 0001);
 
             } else {
                 wrongAttempted = true;
