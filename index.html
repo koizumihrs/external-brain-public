@@ -331,6 +331,7 @@
             <label class="control-toggle"><input type="checkbox" checked value="1" id="ch1-check"> 第1章 総則</label>
             <label class="control-toggle"><input type="checkbox" checked value="2" id="ch2-check"> 第2章 特許出願</label>
             <label class="control-toggle"><input type="checkbox" checked value="3" id="ch3-check"> 第3章 審査</label>
+            <label class="control-toggle"><input type="checkbox" checked value="4" id="ch4-check"> 第4章 特許権</label>
         </div>
 
         <div class="control-block">
@@ -414,7 +415,7 @@
 
         let patentLawData = []; // 外部JSONから読み込む
         let currentMode = "BY_ALIAS";
-        let activeChapters = new Set([1, 2, 3]);
+        let activeChapters = new Set([1, 2, 3, 4]);
         let correctArticles = new Set();
         let focusedArticles = new Set(JSON.parse(localStorage.getItem('focusedArticles') || '[]'));
         let focusModeOnly = false;
@@ -478,6 +479,10 @@
             });
             document.getElementById('ch3-check').addEventListener('change', (e) => {
                 if (e.target.checked) activeChapters.add(3); else activeChapters.delete(3);
+                renderMinimap(); generateQueue(); nextQuestion();
+            });
+            document.getElementById('ch4-check').addEventListener('change', (e) => {
+                if (e.target.checked) activeChapters.add(4); else activeChapters.delete(4);
                 renderMinimap(); generateQueue(); nextQuestion();
             });
             document.getElementById('focus-mode-toggle').addEventListener('change', (e) => {
