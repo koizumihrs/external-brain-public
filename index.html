@@ -402,12 +402,9 @@
         }
 
         function formatArticleName(artStr) {
-            const str = String(artStr);
-            if (str.includes('_')) {
-                const parts = str.split('_');
-                return `${parts[0]}条の${parts[1]}`;
-            }
-            return `${str}条`;
+            const parts = String(artStr).split('_');
+            if (parts.length === 1) return `${parts[0]}条`;
+            return parts[0] + '条の' + parts.slice(1).join('の');
         }
 
         let patentLawData = []; // 外部JSONから読み込む
@@ -666,22 +663,41 @@
             const correctVal = isAliasMode ? currentQuestion.article : currentQuestion.alias;
             
             // ダミー選択肢のプール作成（章フィルターと連動させる）
-            let dummyPool = patentLawData
-                .filter(d => d.article !== currentQuestion.article && activeChapters.has(d.chapter))
-                .map(d => isAliasMode ? d.article : d.alias);
-            
-            // 重複排除
-            dummyPool = [...new Set(dummyPool)];
-            
-            // ランダムに3つ抽出
-            for (let i = dummyPool.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [dummyPool[i], dummyPool[j]] = [dummyPool[j], dummyPool[i]];
+            // BY_ALIASモード（条文番号を選ぶ）は表示文字列ベースで重複排除して、
+            // 105_2_2〜105_2_12のように表示が同じになる条文が複数選択肢に混ざらないようにする
+            let dummyPool;
+            if (isAliasMode) {
+                const seenLabels = new Set([formatArticleName(currentQuestion.article)]);
+                dummyPool = [];
+                const candidates = patentLawData
+                    .filter(d => d.article !== currentQuestion.article && activeChapters.has(d.chapter));
+                for (let i = candidates.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+                }
+                for (const d of candidates) {
+                    const label = formatArticleName(d.article);
+                    if (!seenLabels.has(label)) {
+                        seenLabels.add(label);
+                        dummyPool.push(d.article);
+                    }
+                    if (dummyPool.length >= 3) break;
+                }
+            } else {
+                dummyPool = [...new Set(
+                    patentLawData
+                        .filter(d => d.article !== currentQuestion.article && activeChapters.has(d.chapter))
+                        .map(d => d.alias)
+                )];
+                for (let i = dummyPool.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [dummyPool[i], dummyPool[j]] = [dummyPool[j], dummyPool[i]];
+                }
+                dummyPool = dummyPool.slice(0, 3);
             }
-            const chosenDummies = dummyPool.slice(0, 3);
-            
+
             // 正解を混ぜてシャッフル
-            let finalChoices = [correctVal, ...chosenDummies];
+            let finalChoices = [correctVal, ...dummyPool];
             for (let i = finalChoices.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [finalChoices[i], finalChoices[j]] = [finalChoices[j], finalChoices[i]];
