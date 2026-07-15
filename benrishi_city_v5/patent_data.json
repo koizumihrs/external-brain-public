@@ -633,7 +633,7 @@
   },
   {
     "id": 81,
-    "chapter": 41,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "66",
     "alias": "特許権の設定の登録",
@@ -641,7 +641,7 @@
   },
   {
     "id": 82,
-    "chapter": 41,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "67",
     "alias": "存続期間の原則と延長",
@@ -649,7 +649,7 @@
   },
   {
     "id": 83,
-    "chapter": 41,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "67_2",
     "alias": "期間補償延長の出願手続",
@@ -657,7 +657,7 @@
   },
   {
     "id": 84,
-    "chapter": 41,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "67_3",
     "alias": "期間補償延長の審査・査定",
@@ -665,7 +665,7 @@
   },
   {
     "id": 85,
-    "chapter": 41,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "67_4",
     "alias": "期間補償延長審査への準用",
@@ -673,7 +673,7 @@
   },
   {
     "id": 86,
-    "chapter": 41,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "67_5",
     "alias": "許認可等延長の出願手続",
@@ -681,7 +681,7 @@
   },
   {
     "id": 87,
-    "chapter": 41,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "67_6",
     "alias": "延長出願予告書面",
@@ -689,7 +689,7 @@
   },
   {
     "id": 88,
-    "chapter": 41,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "67_7",
     "alias": "許認可等延長の審査・査定",
@@ -697,7 +697,7 @@
   },
   {
     "id": 89,
-    "chapter": 41,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "67_8",
     "alias": "許認可等延長審査への準用",
@@ -705,7 +705,7 @@
   },
   {
     "id": 90,
-    "chapter": 41,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "68",
     "alias": "業としての実施の専有",
@@ -713,7 +713,7 @@
   },
   {
     "id": 91,
-    "chapter": 41,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "68_2",
     "alias": "処分延長後の効力制限",
@@ -721,7 +721,7 @@
   },
   {
     "id": 92,
-    "chapter": 41,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "69",
     "alias": "効力制限の例外",
@@ -729,7 +729,7 @@
   },
   {
     "id": 93,
-    "chapter": 41,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "70",
     "alias": "技術的範囲の解釈",
@@ -737,7 +737,7 @@
   },
   {
     "id": 94,
-    "chapter": 41,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "71",
     "alias": "判定制度",
@@ -745,7 +745,7 @@
   },
   {
     "id": 95,
-    "chapter": 41,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "71_2",
     "alias": "裁判所からの鑑定嘱託",
@@ -753,7 +753,7 @@
   },
   {
     "id": 96,
-    "chapter": 41,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "72",
     "alias": "利用・抵触関係",
@@ -761,7 +761,7 @@
   },
   {
     "id": 97,
-    "chapter": 41,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "73",
     "alias": "共有特許権の取扱",
@@ -769,7 +769,7 @@
   },
   {
     "id": 98,
-    "chapter": 41,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "74",
     "alias": "真の権利者への移転請求",
@@ -777,7 +777,7 @@
   },
   {
     "id": 99,
-    "chapter": 41,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "76",
     "alias": "相続人不在による消滅",
@@ -785,7 +785,7 @@
   },
   {
     "id": 100,
-    "chapter": 41,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "77",
     "alias": "専用実施権の設定",
@@ -793,7 +793,7 @@
   },
   {
     "id": 101,
-    "chapter": 41,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "78",
     "alias": "通常実施権の許諾",
@@ -801,7 +801,7 @@
   },
   {
     "id": 102,
-    "chapter": 41,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "79",
     "alias": "先使用による通常実施権",
@@ -809,7 +809,7 @@
   },
   {
     "id": 103,
-    "chapter": 41,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "79_2",
     "alias": "特許権の移転の登録前の実施による通常実施権",
@@ -817,7 +817,7 @@
   },
   {
     "id": 104,
-    "chapter": 41,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "80",
     "alias": "無効審判の請求登録前の実施による通常実施権",
@@ -825,7 +825,7 @@
   },
   {
     "id": 105,
-    "chapter": 41,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "81",
     "alias": "意匠権の存続期間満了後の通常実施権",
@@ -833,7 +833,7 @@
   },
   {
     "id": 106,
-    "chapter": 41,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "82",
     "alias": "意匠権の存続期間満了後の通常実施権（実施権者）",
@@ -841,7 +841,7 @@
   },
   {
     "id": 107,
-    "chapter": 42,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "83",
     "alias": "不実施の場合の通常実施権の設定の裁定",
@@ -849,7 +849,7 @@
   },
   {
     "id": 108,
-    "chapter": 42,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "84",
     "alias": "答弁書の提出",
@@ -857,7 +857,7 @@
   },
   {
     "id": 109,
-    "chapter": 42,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "84_2",
     "alias": "通常実施権者の意見の陳述",
@@ -865,7 +865,7 @@
   },
   {
     "id": 110,
-    "chapter": 42,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "85",
     "alias": "審議会の意見の聴取等",
@@ -873,7 +873,7 @@
   },
   {
     "id": 111,
-    "chapter": 42,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "86",
     "alias": "裁定の方式",
@@ -881,7 +881,7 @@
   },
   {
     "id": 112,
-    "chapter": 42,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "87",
     "alias": "裁定の謄本の送達",
@@ -889,7 +889,7 @@
   },
   {
     "id": 113,
-    "chapter": 42,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "88",
     "alias": "対価の供託",
@@ -897,7 +897,7 @@
   },
   {
     "id": 114,
-    "chapter": 42,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "89",
     "alias": "裁定の失効",
@@ -905,7 +905,7 @@
   },
   {
     "id": 115,
-    "chapter": 42,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "90",
     "alias": "裁定の取消し",
@@ -913,7 +913,7 @@
   },
   {
     "id": 116,
-    "chapter": 42,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "91",
     "alias": "裁定取消しの効果",
@@ -921,7 +921,7 @@
   },
   {
     "id": 117,
-    "chapter": 42,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "91_2",
     "alias": "裁定についての不服の理由の制限",
@@ -929,7 +929,7 @@
   },
   {
     "id": 118,
-    "chapter": 42,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "92",
     "alias": "自己の特許発明の実施をするための通常実施権の設定の裁定",
@@ -937,7 +937,7 @@
   },
   {
     "id": 119,
-    "chapter": 42,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "93",
     "alias": "公共の利益のための通常実施権の設定の裁定",
@@ -945,7 +945,7 @@
   },
   {
     "id": 120,
-    "chapter": 42,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "94",
     "alias": "通常実施権の移転等",
@@ -953,7 +953,7 @@
   },
   {
     "id": 121,
-    "chapter": 42,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "95",
     "alias": "質権",
@@ -961,7 +961,7 @@
   },
   {
     "id": 122,
-    "chapter": 42,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "96",
     "alias": "質権設定時の物上代位",
@@ -969,7 +969,7 @@
   },
   {
     "id": 123,
-    "chapter": 42,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "97",
     "alias": "特許権等の放棄",
@@ -977,7 +977,7 @@
   },
   {
     "id": 124,
-    "chapter": 42,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "98",
     "alias": "登録の効果",
@@ -985,7 +985,7 @@
   },
   {
     "id": 125,
-    "chapter": 42,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "99",
     "alias": "通常実施権の対抗力",
@@ -993,7 +993,7 @@
   },
   {
     "id": 126,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "100",
     "alias": "差止請求権",
@@ -1001,7 +1001,7 @@
   },
   {
     "id": 127,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "101",
     "alias": "侵害とみなす行為",
@@ -1009,7 +1009,7 @@
   },
   {
     "id": 128,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "102",
     "alias": "損害の額の推定等",
@@ -1017,7 +1017,7 @@
   },
   {
     "id": 129,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "103",
     "alias": "過失の推定",
@@ -1025,7 +1025,7 @@
   },
   {
     "id": 130,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "104",
     "alias": "生産方法の推定",
@@ -1033,7 +1033,7 @@
   },
   {
     "id": 131,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "104_2",
     "alias": "具体的態様の明示義務",
@@ -1041,7 +1041,7 @@
   },
   {
     "id": 132,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "104_3",
     "alias": "特許権者等の権利行使の制限",
@@ -1049,7 +1049,7 @@
   },
   {
     "id": 133,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "104_4",
     "alias": "主張の制限",
@@ -1057,7 +1057,7 @@
   },
   {
     "id": 134,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "105",
     "alias": "書類の提出等",
@@ -1065,7 +1065,7 @@
   },
   {
     "id": 135,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "105_2",
     "alias": "査証人に対する査証の命令",
@@ -1073,7 +1073,7 @@
   },
   {
     "id": 136,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "105_2_2",
     "alias": "査証人の指定等",
@@ -1081,7 +1081,7 @@
   },
   {
     "id": 137,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "105_2_3",
     "alias": "忌避",
@@ -1089,7 +1089,7 @@
   },
   {
     "id": 138,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "105_2_4",
     "alias": "査証",
@@ -1097,7 +1097,7 @@
   },
   {
     "id": 139,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "105_2_5",
     "alias": "査証を受ける当事者が工場等への立入りを拒む場合等の効果",
@@ -1105,7 +1105,7 @@
   },
   {
     "id": 140,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "105_2_6",
     "alias": "査証報告書の写しの送達等",
@@ -1113,7 +1113,7 @@
   },
   {
     "id": 141,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "105_2_7",
     "alias": "査証報告書の閲覧等",
@@ -1121,7 +1121,7 @@
   },
   {
     "id": 142,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "105_2_8",
     "alias": "査証人の証言拒絶権",
@@ -1129,7 +1129,7 @@
   },
   {
     "id": 143,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "105_2_9",
     "alias": "査証人の旅費等",
@@ -1137,7 +1137,7 @@
   },
   {
     "id": 144,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "105_2_10",
     "alias": "最高裁判所規則への委任",
@@ -1145,7 +1145,7 @@
   },
   {
     "id": 145,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "105_2_11",
     "alias": "第三者の意見",
@@ -1153,7 +1153,7 @@
   },
   {
     "id": 146,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "105_2_12",
     "alias": "損害計算のための鑑定",
@@ -1161,7 +1161,7 @@
   },
   {
     "id": 147,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "105_3",
     "alias": "相当な損害額の認定",
@@ -1169,7 +1169,7 @@
   },
   {
     "id": 148,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "105_4",
     "alias": "秘密保持命令",
@@ -1177,7 +1177,7 @@
   },
   {
     "id": 149,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "105_5",
     "alias": "秘密保持命令の取消し",
@@ -1185,7 +1185,7 @@
   },
   {
     "id": 150,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "105_6",
     "alias": "訴訟記録の閲覧等の請求の通知等",
@@ -1193,7 +1193,7 @@
   },
   {
     "id": 151,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "105_7",
     "alias": "当事者尋問等の公開停止",
@@ -1201,7 +1201,7 @@
   },
   {
     "id": 152,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "106",
     "alias": "信用回復の措置",
@@ -1209,7 +1209,7 @@
   },
   {
     "id": 153,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "107",
     "alias": "特許料",
@@ -1217,7 +1217,7 @@
   },
   {
     "id": 154,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "108",
     "alias": "特許料の納付期限",
@@ -1225,7 +1225,7 @@
   },
   {
     "id": 155,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "109",
     "alias": "特許料の減免又は猶予",
@@ -1233,7 +1233,7 @@
   },
   {
     "id": 156,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "109_2",
     "alias": "共有に係る特許権の特例（減免算定）",
@@ -1241,7 +1241,7 @@
   },
   {
     "id": 157,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "110",
     "alias": "特許料を納付すべき者以外の者による特許料の納付",
@@ -1249,7 +1249,7 @@
   },
   {
     "id": 158,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "111",
     "alias": "既納の特許料の返還",
@@ -1257,7 +1257,7 @@
   },
   {
     "id": 159,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "112",
     "alias": "特許料の追納",
@@ -1265,7 +1265,7 @@
   },
   {
     "id": 160,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "112_2",
     "alias": "特許料の追納による特許権の回復",
@@ -1273,7 +1273,7 @@
   },
   {
     "id": 161,
-    "chapter": 43,
+    "chapter": 4,
     "chapterName": "第4章 特許権",
     "article": "112_3",
     "alias": "回復した特許権の効力の制限",
