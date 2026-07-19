@@ -480,7 +480,7 @@
         function renderChapterFilter() {
             const container = document.getElementById('chapter-filter-container');
             container.innerHTML = '';
-            const chapters = [...new Set(patentLawData.map(d => d.chapter))].sort((a, b) => a - b);
+            const chapters = [...new Set(patentLawData.map(d => d.chapter))].sort((a, b) => { const k = n => n >= 10 ? Math.floor(n/10) + (n%10)*0.1 : n; return k(a) - k(b); });
             // 同一chapterNameが複数ある場合(4-1/4-2/4-3など)に枝番を付けるための集計
             const nameCount = {};
             const nameSeen = {};
@@ -513,7 +513,7 @@
 
         function initGame() {
             // 章フィルターの初期状態を決める（データにある章 × 保存済みの設定）
-            const allChapters = [...new Set(patentLawData.map(d => d.chapter))].sort((a, b) => a - b);
+            const allChapters = [...new Set(patentLawData.map(d => d.chapter))].sort((a, b) => { const k = n => n >= 10 ? Math.floor(n/10) + (n%10)*0.1 : n; return k(a) - k(b); });
             const saved = loadUiSettings();
             if (saved && Array.isArray(saved.activeChapters)) {
                 const savedActive = new Set(saved.activeChapters);
@@ -560,7 +560,7 @@
 
         function renderMinimap() {
             minimapContainer.innerHTML = '';
-            const chapters = [...new Set(patentLawData.map(d => d.chapter))].sort((a, b) => a - b);
+            const chapters = [...new Set(patentLawData.map(d => d.chapter))].sort((a, b) => { const k = n => n >= 10 ? Math.floor(n/10) + (n%10)*0.1 : n; return k(a) - k(b); });
             chapters.forEach(ch => {
                 if (!activeChapters.has(ch)) return;
                 const chData = patentLawData.filter(d => d.chapter === ch);
