@@ -519,9 +519,9 @@
                 const savedActive = new Set(saved.activeChapters);
                 const knownBefore = new Set(saved.knownChapters || saved.activeChapters);
                 // 既知の章は保存状態を踏襲、前回保存時になかった新しい章はデフォルトON
-                activeChapters = new Set(allChapters.filter(ch => knownBefore.has(ch) ? savedActive.has(ch) : true));
+                activeChapters = new Set(allChapters.filter(ch => knownBefore.has(ch) ? savedActive.has(ch) : false));
             } else {
-                activeChapters = new Set(allChapters);
+                activeChapters = new Set(); // 初回はすべてOFF
             }
 
             if (saved && typeof saved.focusModeOnly === 'boolean') {
